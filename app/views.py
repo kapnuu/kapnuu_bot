@@ -43,7 +43,7 @@ def send_reply(resp):
 def process_request():
     data = request.json  # json.loads(request.data)
     if data:
-        if data['message']:
+        if 'message' in data:
             message = data['message']
             chat_id = message['chat']['id']
 
@@ -61,7 +61,7 @@ def process_request():
             else:
                 return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % text})
 
-    # abort(400)
+    abort(400)
 
 
 @app.route('/start')
