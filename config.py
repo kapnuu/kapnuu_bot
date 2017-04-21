@@ -21,6 +21,7 @@ class Config:
 
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
+
 class ProductionConfig(Config):
     DEBUG = False
 
