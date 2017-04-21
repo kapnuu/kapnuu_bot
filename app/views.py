@@ -56,6 +56,8 @@ def process_request():
                 return weather_f(chat_id)
             elif text == '/currency':
                 return currency_f('usd', chat_id)
+            elif text.lower() == 'замучить котов':
+                return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
             else:
                 return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % text})
 
