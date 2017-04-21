@@ -56,7 +56,7 @@ def process_request():
                 return weather_f(chat_id)
             elif text == '/currency':
                 return currency_f('usd', chat_id)
-            elif text.lower() == 'замучить котов':
+            elif text.lower() == 'замучить котов' or text.lower() == 'torture cats':
                 return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
             else:
                 return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % text})
@@ -69,7 +69,18 @@ def start_f(chat_id=None):
 
     responses = ['Hello!', 'Hi there', 'Дратути', 'Превед', 'Привет', 'Hi', 'Ксюшенька-пампушенька']
 
-    resp = random.choice(responses)
+    hi = random.choice(responses)
+
+    resp = '''%s. Sorry, I am not very useful bot, I'm just a my creator's helper: he learning to develop telegram bots.
+
+You can get info by sending these commands:
+
+/weather -- get current weather in Nizhniy Novgorod (other cities TBD)
+/currency -- get USD to RUB rate (other currencies TBD)
+
+<i>kapnuu bot</i>
+
+<b>P. S.</b> And do not try to torture cats. Never. NEVER!''' % hi
 
     if chat_id:
         return send_reply({'chat_id': chat_id, 'text': resp})
