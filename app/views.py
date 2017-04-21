@@ -2,7 +2,10 @@ from app import app, openweathermap, cbr
 import calendar
 import datetime
 from flask import json, request, abort
+import logging
 import config
+
+log = logging.getLogger('app')
 
 # URL = 'https://api.telegram.org/bot%s/' % config.BOT_TOKEN
 # HookURL = ''
@@ -26,6 +29,8 @@ def send_reply(resp):
 
 @app.route('/hook', methods=['GET', 'POST'])
 def process_request():
+    log.info('process_request')
+    log.info('process_request: %s' % request)
     data = request.json  # json.loads(request.data)
     if data:
         if data['message']:
