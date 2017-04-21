@@ -83,7 +83,7 @@ def weather_f(chat_id=None):
     weather = openweathermap.current_weather()
     if weather:
         t = weather['main']['temp']
-        resp = '<b>%s</b>: %s%s°C %s / %s %s' %\
+        resp = '<b>%s</b>: %s%s°C %s / %s <small>%s</small>' %\
                (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
                 weather['weather'][0]['description'], dt(weather['dt']))
     else:
