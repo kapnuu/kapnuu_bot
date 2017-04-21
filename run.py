@@ -3,12 +3,12 @@ import os
 import signal
 import sys
 from app import app
-#import logging
+import logging
 import config
-#import requests
+import requests
 
 URL = 'https://api.telegram.org/bot%s/' % config.Config.BOT_TOKEN
-HookURL = ''
+HookURL = 'https://kapnuu-bot.herokuapp.com/hook'
 
 
 def signal_term_handler(signum, frame):
@@ -18,10 +18,10 @@ def signal_term_handler(signum, frame):
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 try:
-    #  set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
-    #  if set_hook.status_code != 200:
-    #      logging.error("Can't set hook: %s. Quit." % set_hook.text)
-    #      exit(1)
+    set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
+    if set_hook.status_code != 200:
+        logging.error("Can't set hook: %s. Quit." % set_hook.text)
+        exit(1)
 
     app.run(debug=app.config['DEBUG'], port=int(os.environ.get('PORT', 8888)))
 except KeyboardInterrupt:

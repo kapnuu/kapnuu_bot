@@ -24,7 +24,7 @@ def send_reply(resp):
     )
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/hook', methods=['GET', 'POST'])
 def process_request():
     data = request.json  # json.loads(request.data)
     if data:
