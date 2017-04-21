@@ -83,14 +83,14 @@ def weather_f(chat_id=None):
     weather = openweathermap.current_weather()
     if weather:
         t = weather['main']['temp']
-        resp = '<b>%s</b>: %s%s°C %s / %s' %\
-               (weather['name'], '-' if t < 0 else '', t,weather['weather'][0]['main'],
+        resp = '<b>%s</b>: %s%s&deg;C %s / %s' %\
+               (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
                 weather['weather'][0]['description'])  # , dt(weather['dt']))
     else:
         resp = 'WTF?'
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'text': resp})
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
 
 
