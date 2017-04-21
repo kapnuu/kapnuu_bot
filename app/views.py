@@ -67,18 +67,20 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None):
 
-    responses = ['Hello!', 'Hi there', 'Дратути', 'Превед', 'Привет', 'Hi', 'Ксюшенька-пампушенька']
+    responses = ['Hello!', 'Hi there,', 'Дратути,', 'Превед,', 'Привет,', 'Hi,', 'Ксюшенька-пампушенька, любищь тебя,']
 
     hi = random.choice(responses)
 
-    resp = '''%s. Sorry, I am not very useful bot, I'm just a my creator's helper: he learning to develop telegram bots.
+    resp = '''%s
+Sorry, I am not very useful bot, I'm just a my creator's helper: now he is learning how to develop telegram bots.
 
 You can get info by sending these commands:
 
-/weather -- get current weather in Nizhniy Novgorod (other cities TBD)
-/currency -- get USD to RUB rate (other currencies TBD)
+/start — this message
+/weather — get current weather in Nizhniy Novgorod (other cities TBD)
+/currency — get USD to RUB rate (other currencies TBD)
 
-<i>kapnuu bot</i>
+Thanks, <i>kapnuu bot</i>
 
 <b>P. S.</b> And do not try to torture cats. Never. NEVER!''' % hi
 
