@@ -59,7 +59,7 @@ def process_request():
             elif text == '/currency':
                 return currency_f('usd', chat_id)
             else:
-                send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % text})
+                return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % text})
 
     # abort(400)
 
