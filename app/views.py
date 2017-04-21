@@ -11,6 +11,11 @@ def index():
     return 'It works'
 
 
+@app.route('/favicon.ico')
+def favicon():
+    abort(404)
+
+
 log = logging.getLogger('app')
 
 # URL = 'https://api.telegram.org/bot%s/' % config.BOT_TOKEN
@@ -36,6 +41,7 @@ def send_reply(resp):
 @app.route('/hook', methods=['GET', 'POST'])
 def process_request():
     log.info('process_request')
+    abort(404)
     log.info('process_request: %s' % request)
     data = request.json  # json.loads(request.data)
     if data:
