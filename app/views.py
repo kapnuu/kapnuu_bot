@@ -41,8 +41,6 @@ def send_reply(resp):
 
 @app.route('/hook', methods=['GET', 'POST'])
 def process_request():
-    # log.info('process_request')
-    log.info('process_request: %s' % request)
     data = request.json  # json.loads(request.data)
     if data:
         if data['message']:
@@ -83,7 +81,7 @@ def weather_f(chat_id=None):
     weather = openweathermap.current_weather()
     if weather:
         t = weather['main']['temp']
-        resp = '<b>%s</b>: %s%s&deg;C %s / %s' %\
+        resp = '<b>%s</b>: %s%s°C %s / %s' %\
                (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
                 weather['weather'][0]['description'])  # , dt(weather['dt']))
     else:
@@ -102,8 +100,8 @@ def currency_f(iso, chat_id=None):
     if rate:
         resp = '1 %s = %s RUR' % (iso.upper(), rate)
     else:
-        resp = "I don't know <em>%s</em>" % iso
+        resp = "I don't know <i>%s</i>" % iso
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'text': resp})
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
