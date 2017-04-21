@@ -83,7 +83,7 @@ You can get info by sending these commands:
 <b>P. S.</b> And do not try to torture cats. Never. NEVER!''' % hi
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'text': resp})
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
 
 
