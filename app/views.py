@@ -67,7 +67,7 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None):
 
-    responses = ['Hello!', 'Hi there,', 'Дратути,', 'Превед,', 'Привет,', 'Hi,', 'Ксюшенька-пампушенька, любищь тебя,']
+    responses = ['Hello!', 'Hi there.', 'Дратути!', 'Превед!!1111адинвдин', 'Привет!', 'Hi!', 'Ксюшенька-пампушенька, любищь тебя, дурочку!']
 
     hi = random.choice(responses)
 
