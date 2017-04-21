@@ -3,6 +3,7 @@ import calendar
 import datetime
 from flask import json, request, abort
 import logging
+import random
 # import config
 
 
@@ -63,7 +64,10 @@ def process_request():
 
 @app.route('/start')
 def start_f(chat_id=None):
-    resp = 'Hello.'
+
+    responses = ['Hello!', 'Hi there', 'Дратути', 'Превед', 'Привет', 'Hi', 'Ксюшенька-пампушенька']
+
+    resp = random.choice(responses)
 
     if chat_id:
         return send_reply({'chat_id': chat_id, 'text': resp})
