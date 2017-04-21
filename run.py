@@ -22,7 +22,8 @@ try:
         set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
         if set_hook.status_code != 200:
             logging.error("Can't set hook: %s. Quit." % set_hook.text)
-            exit(1)
+            if set_hook.status_code != 429:  # "error_code":429,"description":"Too Many Requests: retry after 1"
+                exit(1)
 
     port = int(os.environ.get('PORT', 8881))
     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
