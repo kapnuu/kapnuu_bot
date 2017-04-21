@@ -1,12 +1,13 @@
 #!flask/bin/python
+import os
 import signal
 import sys
 from app import app
-import logging
+#import logging
 import config
-import requests
+#import requests
 
-URL = 'https://api.telegram.org/bot%s/' % config.BOT_TOKEN
+URL = 'https://api.telegram.org/bot%s/' % config.Config.BOT_TOKEN
 HookURL = ''
 
 
@@ -22,6 +23,6 @@ try:
     #      logging.error("Can't set hook: %s. Quit." % set_hook.text)
     #      exit(1)
 
-    app.run(debug=True, port=8888)
+    app.run(debug=app.config['DEBUG'], port=int(os.environ.get('PORT', 8888)))
 except KeyboardInterrupt:
     signal_term_handler(signal.SIGTERM, None)

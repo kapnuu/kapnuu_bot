@@ -1,14 +1,30 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-CSRF_ENABLED = True
-SECRET_KEY = 'Wakeup(Wakeup)-Grab-a-brush-and-put-a-little-(Makeup)'
 
-SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+class Config:
+    basedir = os.path.abspath(os.path.dirname(__file__))
 
-OWM_APIKEY = ''
-OWM_CITYID = 0
+    CSRF_ENABLED = True
+    SECRET_KEY = 'Wakeup(Wakeup)-Grab-a-brush-and-put-a-little-(Makeup)'
 
-BOT_TOKEN = ''
+    database_uri = os.environ.get('DATABASE_URL')
+    if database_uri is None:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+    else:
+        SQLALCHEMY_DATABASE_URI = database_uri
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+
+    OWM_APIKEY = os.environ.get('OWM_APIKEY')
+    OWM_CITYID = os.environ.get('OWM_CITYID')
+
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+
+class DevelopConfig(Config):
+    DEBUG = True
+    DEVELOPMENT = True
