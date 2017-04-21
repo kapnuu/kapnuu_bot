@@ -5,7 +5,7 @@ class Config:
     basedir = os.path.abspath(os.path.dirname(__file__))
 
     CSRF_ENABLED = True
-    SECRET_KEY = 'Wakeup(Wakeup)-Grab-a-brush-and-put-a-little-(Makeup)'
+    SECRET_KEY = os.urandom(16)
 
     database_uri = os.environ.get('DATABASE_URL')
     if database_uri is None:

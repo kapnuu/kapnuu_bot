@@ -18,11 +18,13 @@ def signal_term_handler(signum, frame):
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 try:
-    set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
-    if set_hook.status_code != 200:
-        logging.error("Can't set hook: %s. Quit." % set_hook.text)
-        exit(1)
+    if config.Config.BOT_TOKEN:
+        set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
+        if set_hook.status_code != 200:
+            logging.error("Can't set hook: %s. Quit." % set_hook.text)
+            exit(1)
 
-    app.run(debug=app.config['DEBUG'], port=int(os.environ.get('PORT', 8888)))
+    port = int(os.environ.get('PORT', 8881))
+    app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
 except KeyboardInterrupt:
     signal_term_handler(signal.SIGTERM, None)

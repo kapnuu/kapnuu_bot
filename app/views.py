@@ -3,7 +3,13 @@ import calendar
 import datetime
 from flask import json, request, abort
 import logging
-import config
+# import config
+
+
+@app.route('/')
+def index():
+    return 'It works'
+
 
 log = logging.getLogger('app')
 
@@ -27,11 +33,6 @@ def send_reply(resp):
     )
 
 
-@app.route('/', methods=['GET'])
-def index():
-    return 'It works'
-
-
 @app.route('/hook', methods=['GET', 'POST'])
 def process_request():
     log.info('process_request')
@@ -52,7 +53,7 @@ def process_request():
             elif text == '/currency':
                 return currency_f('usd', chat_id)
             pass
-    abort(400)
+    # abort(400)
 
 
 @app.route('/start')
