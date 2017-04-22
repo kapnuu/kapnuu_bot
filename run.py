@@ -15,19 +15,20 @@ def signal_term_handler(signum, frame):
     print('SIGTERM received')
     sys.exit(1)
 
+log = logging.getLogger('app')
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 try:
-    logging.info('Request token is %s' % app.config.get('REQUEST_TOKEN'))
+    log.info('Request token is %s' % app.config.get('REQUEST_TOKEN'))
     if app.config.get('BOT_TOKEN') and app.config.get('REQUEST_TOKEN'):
         get_hook = requests.get(URL + "getWebhookInfo")
         if get_hook.status_code != 200:
-            logging.error("Can't get hook: %s. Quit." % get_hook.text)
+            log.error("Can't get hook: %s. Quit." % get_hook.text)
             exit(1)
         if not get_hook.url or len(get_hook.url) == 0:
             set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
             if set_hook.status_code != 200:
-                logging.error("Can't set hook: %s. Quit." % set_hook.text)
+                log.error("Can't set hook: %s. Quit." % set_hook.text)
                 if set_hook.status_code != 429:  # "error_code":429,"description":"Too Many Requests: retry after 1"
                     exit(1)
 
