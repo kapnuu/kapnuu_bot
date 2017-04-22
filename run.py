@@ -20,13 +20,14 @@ log = logging.getLogger('app')
 signal.signal(signal.SIGTERM, signal_term_handler)
 try:
     log.info('Request token is %s' % app.config.get('REQUEST_TOKEN'))
+    log.info('Bot token is %s' % app.config.get('BOT_TOKEN'))
     if app.config.get('BOT_TOKEN') and app.config.get('REQUEST_TOKEN'):
         log.debug('Getting webhook')
         get_hook = requests.get(URL + "getWebhookInfo")
         if get_hook.status_code != 200:
             log.error("Can't get hook: %s. Quit." % get_hook.text)
             exit(1)
-        log.debug('Webhook set to %s' % get_hook.url)
+        log.debug('Webhook is set to %s' % get_hook.url)
         if not get_hook.url or len(get_hook.url) == 0:
             log.debug('Setting webhook')
             set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
