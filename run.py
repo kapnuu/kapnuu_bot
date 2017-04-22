@@ -4,7 +4,7 @@ import signal
 import sys
 from app import app
 import logging
-import config
+#import config
 import requests
 
 URL = 'https://api.telegram.org/bot%s/' % app.config.get('BOT_TOKEN')
@@ -18,6 +18,7 @@ def signal_term_handler(signum, frame):
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 try:
+    logging.info('Request token is %s' % app.config.get('REQUEST_TOKEN'))
     if app.config.get('BOT_TOKEN') and app.config.get('REQUEST_TOKEN'):
         get_hook = requests.get(URL + "getWebhookInfo")
         if get_hook.status_code != 200:
