@@ -7,3 +7,12 @@ class Data(db.Model):
     param = db.Column(db.String(), nullable=True)
     value = db.Column(db.String(), nullable=True)
     last_updated = db.Column(db.DateTime, nullable=True)
+
+
+class BotUser(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    telegram_id = db.Column(db.Integer)
+    huify = db.Column(db.Boolean)
+    owm_city = db.Column(db.Integer, nullable=True)
+    greet = db.Column(db.String, nullable=True)

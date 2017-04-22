@@ -4,7 +4,7 @@ import datetime
 from flask import json, request, abort
 import logging
 import random
-# import config
+import config
 
 
 @app.route('/')
@@ -39,7 +39,7 @@ def send_reply(resp):
     )
 
 
-@app.route('/hook', methods=['GET', 'POST'])
+@app.route('/%s/hook' % config.Config.REQUEST_TOKEN, methods=['GET', 'POST'])
 def process_request():
     data = request.json  # json.loads(request.data)
     if data:
@@ -93,7 +93,7 @@ You can get info by sending these commands:
 
 /help — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
-/currency — get currency (use /currency/<i>ISO</i>) to RUB rate
+/currency — get currency (use /currency/<i>ISO</i>) to RUR rate
 /now — get current date and time in UTC
 
 Thanks, <i>kapnuu bot</i>
