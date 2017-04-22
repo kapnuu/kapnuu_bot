@@ -45,8 +45,13 @@ def process_request():
     try:
         data = request.json  # json.loads(request.data)
         if data:
+            message = None
             if 'message' in data:
                 message = data['message']
+            elif 'edited_message' in request.json:
+                message = data['edited_message']
+
+            if message:
                 chat_id = message['chat']['id']
 
                 text = message['text'].lower()
@@ -74,7 +79,7 @@ def process_request():
                 else:
                     return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
             else:
-                log.error('Mo `message` in request.json: %s' % request.data)
+                log.error('No `message` in request.json: %s' % request.data)
         else:
             log.error('request.json is None: %s' % request.data)
     except Exception:
