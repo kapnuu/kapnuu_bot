@@ -156,11 +156,34 @@ def now_f(chat_id=None):
 
 @app.route('/whoami')
 def whoami_f(chat_id=None, who_id=None):
-    # user = models.BotUser.query.filter_by(telegram_id=who_id)
-    # if user
+    greet = None
+    huify = False
+    user = models.BotUser.query.filter_by(telegram_id=who_id).first()
+    if user:
+        greet = user.greet
+        huify = user.huify
+
     resp = '''Hello, user #%s!
     
 This feature in development now.''' % who_id
+    if huify:
+        resp += '''
+
+Use /unhuify to stop huifying your messages'''
+    else:
+        resp += '''
+
+Use /huify to huify your messages'''
+    if greet:
+        resp += '''
+
+You told me I can call you <b>%s</b>
+Use /mynameis to change your personal greeting.''' % greet
+    else:
+        resp += '''
+
+Use /mynameis if you want a personal greeting.'''
+
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
