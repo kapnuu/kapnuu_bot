@@ -207,13 +207,14 @@ Use /mynameis if you want a personal greeting.'''
 
 
 def huify_f(chat_id, huify, who):
+    log.info('huify %s % s %s' % (chat_id, huify, who))
     user = models.BotUser.query.filter_by(telegram_id=who['id']).first()
     if user:
         user.huify = huify
     else:
         user = models.BotUser(telegram_id=who['id'], huify=huify)
 
-    resp = 'OK, %s, your messages will be %shuified' % (who['first_name'], '' if huify else 'un')
+    resp = 'OK, %s, your messages will be %s' % (who['first_name'], 'huified.' if huify else 'unhuified.')
 
     db.session.add(user)
     db.commit()
