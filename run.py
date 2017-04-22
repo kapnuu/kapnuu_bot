@@ -36,6 +36,8 @@ try:
                 log.error("Can't set hook: %s. Quit." % set_hook.text)
                 if set_hook.status_code != 429:  # "error_code":429,"description":"Too Many Requests: retry after 1"
                     exit(1)
+        else:
+            log.info('Hook is set to %s' % hook['result']['url'])
 
     port = int(os.environ.get('PORT', 8881))
     log.info('Starting server at port %s' % port)
