@@ -47,6 +47,8 @@ def process_request():
             message = data['message']
             chat_id = message['chat']['id']
 
+            log.info('id: %s' % message["from"].get("id"))
+
             text = message['text'].lower()
             if text.startswith('/start') or text == '/help':
                 return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
