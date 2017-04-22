@@ -83,8 +83,8 @@ def process_request():
                 log.error('No `message` in request.json: %s' % request.data)
         else:
             log.error('request.json is None: %s' % request.data)
-    except Exception:
-        log.error('Something went wrong')
+    except Exception as ex:
+        log.error('Something went wrong: %s' % ex)
     abort(400)
 
 
@@ -207,12 +207,12 @@ Use /mynameis if you want a personal greeting.'''
 
 
 def huify_f(chat_id, huify, who):
-    # log.info('huify %s % s %s' % (chat_id, huify, who))
+    log.info('huify %s % s %s %s' % (chat_id, huify, who.get('id'), who.get('first_name')))
     user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
     if user:
-        user.huify = huify
+        user.huify = bool(huify)
     else:
-        user = models.BotUser(telegram_id=who.get('id'), huify=huify)
+        user = models.BotUser(telegram_id=who.get('id'), huify=bool(huify))
 
     resp = 'OK, %s, your messages will be %s' % (who.get('first_name'), 'huified.' if huify else 'unhuified.')
 
