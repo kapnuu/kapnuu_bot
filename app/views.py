@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models
+from app import app, openweathermap, cbr, models, db
 import calendar
 import datetime
 from flask import json, request, abort
@@ -53,6 +53,10 @@ def process_request():
                 return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
             elif text == '/whoami':
                 return whoami_f(chat_id, message["from"].get("id"))
+            elif text == '/huify':
+                return huify_f(chat_id, True, message["from"])
+            elif text == '/unhuify':
+                return huify_f(chat_id, False, message["from"])
             elif text == '/weather':
                 return weather_f(chat_id)
             elif text.startswith('/currency'):
@@ -188,3 +192,17 @@ Use /mynameis if you want a personal greeting.'''
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
+
+
+def huify_f(chat_id, huify, who):
+    user = models.BotUser.query.filter_by(telegram_id=who['id']).first()
+    if user:
+        user.huify = huify
+    else:
+        user = models.BotUser(telegram_id=who['id'], huify=huify)
+
+    resp = 'OK, %s, your messages will be %shuified' % (who['first_name'], '' if huify else 'un')
+
+    db.session.add(user)
+    db.commit()
+    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
