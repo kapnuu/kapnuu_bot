@@ -44,6 +44,7 @@ def process_request2():
 def process_request():
     try:
         data = request.json  # json.loads(request.data)
+        log.info(data)
         if data:
             message = None
             if 'message' in data:
