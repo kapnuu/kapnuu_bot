@@ -72,6 +72,9 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None, who=None, who_id=None):
 
+    if not who and not who_id:
+        log.info('User #%s %s', (who_id, who))
+
     responses = ['Hello, %s!',
                  'Hi there, %s.',
                  'Дратути, %s!',
