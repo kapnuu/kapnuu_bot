@@ -35,3 +35,5 @@ try:
     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
 except KeyboardInterrupt:
     signal_term_handler(signal.SIGTERM, None)
+except Exception:
+    logging.error('Start failed')
