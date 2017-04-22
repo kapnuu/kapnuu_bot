@@ -21,15 +21,15 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 try:
     log.info('Request token is %s' % app.config.get('REQUEST_TOKEN'))
     log.info('Bot token is %s' % app.config.get('BOT_TOKEN'))
-    if app.config.get('BOT_TOKEN') and app.config.get('REQUEST_TOKEN'):
-        log.debug('Getting webhook')
+    if app.config.get('BOT_TOKEN') is not None and app.config.get('REQUEST_TOKEN'):
+        log.info('Getting webhook')
         get_hook = requests.get(URL + "getWebhookInfo")
         if get_hook.status_code != 200:
             log.error("Can't get hook: %s. Quit." % get_hook.text)
             exit(1)
-        log.debug('Webhook is set to %s' % get_hook.url)
+        log.info('Webhook is set to %s' % get_hook.url)
         if not get_hook.url or len(get_hook.url) == 0:
-            log.debug('Setting webhook')
+            log.info('Setting webhook')
             set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
             if set_hook.status_code != 200:
                 log.error("Can't set hook: %s. Quit." % set_hook.text)
@@ -37,7 +37,7 @@ try:
                     exit(1)
 
     port = int(os.environ.get('PORT', 8881))
-    log.debug('Starting server at port %s' % port)
+    log.info('Starting server at port %s' % port)
     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=port)
 except KeyboardInterrupt:
     signal_term_handler(signal.SIGTERM, None)
