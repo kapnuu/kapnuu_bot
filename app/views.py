@@ -74,9 +74,9 @@ def process_request():
                 else:
                     return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
             else:
-                log.error('Mo `message` in request.json')
+                log.error('Mo `message` in request.json: %s' % request.data)
         else:
-            log.error('request.json is None')
+            log.error('request.json is None: %s' % request.data)
     except Exception:
         log.error('Something went wrong')
     abort(400)
