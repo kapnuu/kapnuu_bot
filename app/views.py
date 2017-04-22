@@ -6,6 +6,14 @@ import logging
 import random
 import config
 
+log = logging.getLogger('app')
+
+
+def dt(u): return datetime.datetime.fromtimestamp(u)
+
+
+def ut(d): return calendar.timegm(d.timetuple())
+
 
 @app.route('/')
 def index():
@@ -17,18 +25,6 @@ def favicon():
     abort(404)
 
 
-log = logging.getLogger('app')
-
-# URL = 'https://api.telegram.org/bot%s/' % config.BOT_TOKEN
-# HookURL = ''
-
-
-def dt(u): return datetime.datetime.fromtimestamp(u)
-
-
-def ut(d): return calendar.timegm(d.timetuple())
-
-
 def send_reply(resp):
     if 'method' not in resp:
         resp['method'] = 'sendMessage'
@@ -37,6 +33,11 @@ def send_reply(resp):
         status=200,
         mimetype='application/json'
     )
+
+
+@app.route('/hook', methods=['GET', 'POST'])
+def process_request2():
+    return process_request()
 
 
 @app.route('/%s/hook' % config.Config.REQUEST_TOKEN, methods=['GET', 'POST'])
