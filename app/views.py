@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr
+from app import app, openweathermap, cbr, models
 import calendar
 import datetime
 from flask import json, request, abort
@@ -47,11 +47,11 @@ def process_request():
             message = data['message']
             chat_id = message['chat']['id']
 
-            log.info('id: %s' % message["from"].get("id"))
-
             text = message['text'].lower()
             if text.startswith('/start') or text == '/help':
                 return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
+            elif text == '/whoami':
+                return whoami_f(chat_id, message["from"].get("id"))
             elif text == '/weather':
                 return weather_f(chat_id)
             elif text.startswith('/currency'):
@@ -80,7 +80,7 @@ def start_f(chat_id=None, who=None, who_id=None):
     responses = ['Hello, %s!',
                  'Hi there, %s.',
                  'Дратути, %s!',
-                 'Превед %s!!1111адинвдин',
+                 'Превед %s!!1111адинaдин',
                  'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
@@ -95,6 +95,7 @@ You can get info by sending these commands:
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
 /currency — get currency (use /currency/<i>ISO</i>) to RUR rate
 /now — get current date and time in UTC
+/whoami — get your personal settings
 
 Thanks, <i>kapnuu bot</i>
 
@@ -114,7 +115,7 @@ def weather_f(chat_id=None):
         t = weather['main']['temp']
         resp = '''<b>%s</b>: %s%s°C %s / %s
 %s''' % (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
-         weather['weather'][0]['description'], dt(weather['dt']).strftime('%a %b %d %H:%M %Y'))
+         weather['weather'][0]['description'], dt(weather['dt']).strftime('%a %b %d %H:%M %Y UTC'))
     else:
         resp = 'WTF?'
 
@@ -144,10 +145,22 @@ def currency_f(iso, chat_id=None):
 
 @app.route('/now')
 def now_f(chat_id=None):
-    resp = datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
+    resp = datetime.datetime.now().strftime('%a %b %d %T.%f %Y UTC')
 
     if chat_id:
         # if random.choice([0, 1]) == 0:
         #    return send_reply({'chat_id': chat_id, 'sticker': 'BQADAgADeAcAAlOx9wOjY2jpAAHq9DUC'})
         return send_reply({'chat_id': chat_id, 'text': resp})
     return '<h1>%s</h1>' % resp
+
+
+@app.route('/whoami')
+def whoami_f(chat_id=None, who_id=None):
+    # user = models.BotUser.query.filter_by(telegram_id=who_id)
+    # if user
+    resp = '''Hello, user #%s!
+    
+This feature in development now.''' % who_id
+    if chat_id:
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return '<pre>%s</pre>' % resp
