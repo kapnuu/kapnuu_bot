@@ -48,14 +48,15 @@ def process_request():
             chat_id = message['chat']['id']
 
             text = message['text'].lower()
-            if text.startswith('/start'):
-                return start_f(chat_id, message["from"].get("first_name"))
-            elif text == '/help':
-                pass
+            if text.startswith('/start') or text == '/help':
+                return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
             elif text == '/weather':
                 return weather_f(chat_id)
-            elif text == '/currency':
-                return currency_f('usd', chat_id)
+            elif text.startswith('/currency'):
+                iso = text[10:]
+                if not iso:
+                    iso = 'usd'
+                return currency_f(iso, chat_id)
             elif text == 'замучить котов'\
                     or text == 'мучить котов'\
                     or text == 'torture cats':
@@ -69,7 +70,7 @@ def process_request():
 
 
 @app.route('/start')
-def start_f(chat_id=None, who=None):
+def start_f(chat_id=None, who=None, who_id=None):
 
     responses = ['Hello, %s!',
                  'Hi there, %s.',
@@ -87,7 +88,7 @@ You can get info by sending these commands:
 
 /start — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
-/currency — get USD to RUB rate (other currencies TBD)
+/currency — get currency(use ISO) to RUB rate (other currencies TBD)
 /now — get current date and time in utc
 
 Thanks, <i>kapnuu bot</i>
@@ -137,7 +138,7 @@ def now_f(chat_id=None):
     resp = datetime.datetime.now().strftime('%a %b %d %T %Y')
 
     if chat_id:
-        if random.choice([0, 1]) == 0:
-            return send_reply({'chat_id': chat_id, 'sticker': 'BQADAgADeAcAAlOx9wOjY2jpAAHq9DUC'})
+        # if random.choice([0, 1]) == 0:
+        #    return send_reply({'chat_id': chat_id, 'sticker': 'BQADAgADeAcAAlOx9wOjY2jpAAHq9DUC'})
         return send_reply({'chat_id': chat_id, 'text': resp})
     return '<h1>%s</h1>' % resp
