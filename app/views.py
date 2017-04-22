@@ -82,7 +82,7 @@ def start_f(chat_id=None, who=None, who_id=None):
                  'Дратути, %s!',
                  'Превед %s!!1111адинвдин',
                  'Привет, %s!',
-                 'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку!']
+                 'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
     hi = random.choice(responses) % (who if who else 'Human')
 
@@ -91,10 +91,10 @@ Sorry, I am not very useful bot, I'm just a my creator's helper: now he is learn
 
 You can get info by sending these commands:
 
-/start — this message
+/help — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
 /currency — get currency(use ISO) to RUB rate (other currencies TBD)
-/now — get current date and time in utc
+/now — get current date and time in UTC
 
 Thanks, <i>kapnuu bot</i>
 
@@ -127,11 +127,15 @@ def weather_f(chat_id=None):
 def currency_f(iso, chat_id=None):
     resp = None
 
-    rate = cbr.currency_rate(iso.lower())
-    if rate:
-        resp = '1 %s = %s RUR' % (iso.upper(), rate)
+    iso = iso.lower()
+    if iso == 'rur':
+        resp = '1 RUR is 1 RUR, dude!'
     else:
-        resp = "I don't know <i>%s</i>" % iso
+        rate = cbr.currency_rate(iso)
+        if rate:
+            resp = '1 %s = %s RUR' % (iso.upper(), rate)
+        else:
+            resp = "I don't know <i>%s</i>" % iso
 
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
