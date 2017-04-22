@@ -6,6 +6,7 @@ from app import app
 import logging
 #import config
 import requests
+import json
 
 URL = 'https://api.telegram.org/bot%s/' % app.config.get('BOT_TOKEN')
 HookURL = 'https://kapnuu-bot.herokuapp.com/%s/hook' % app.config.get('REQUEST_TOKEN')
@@ -27,8 +28,8 @@ try:
         if get_hook.status_code != 200:
             log.error("Can't get hook: %s. Quit." % get_hook.text)
             exit(1)
-        log.info('Webhook is set to %s' % get_hook.url)
-        if not get_hook.url or len(get_hook.url) == 0:
+        hook = json.loads(get_hook.text)
+        if not hook['result']['url']:
             log.info('Setting webhook')
             set_hook = requests.get(URL + "setWebhook?url=%s" % HookURL)
             if set_hook.status_code != 200:
