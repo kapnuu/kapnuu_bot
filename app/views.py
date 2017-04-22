@@ -93,7 +93,7 @@ You can get info by sending these commands:
 
 /help — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
-/currency — get currency(use ISO) to RUB rate (other currencies TBD)
+/currency — get currency (use /currency/<i>ISO</i>) to RUB rate
 /now — get current date and time in UTC
 
 Thanks, <i>kapnuu bot</i>
@@ -112,9 +112,9 @@ def weather_f(chat_id=None):
     weather = openweathermap.current_weather()
     if weather:
         t = weather['main']['temp']
-        resp = '<b>%s</b>: %s%s°C %s / %s %s' %\
-               (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
-                weather['weather'][0]['description'], dt(weather['dt']))
+        resp = '''<b>%s</b>: %s%s°C %s / %s
+%s''' % (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
+         weather['weather'][0]['description'], dt(weather['dt']).strftime('%a %b %d %T %Y'))
     else:
         resp = 'WTF?'
 
