@@ -19,7 +19,7 @@ class Config:
     OWM_APIKEY = os.environ.get('OWM_APIKEY')
     OWM_CITYID = os.environ.get('OWM_CITYID')
 
-    BOT_TOKEN = '276071222:AAGGS7qBnPKYui9BK0O6sbcGU2nweOmNFJs'  # os.environ.get('BOT_TOKEN')
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
     REQUEST_TOKEN = os.environ.get('BOT_TOKEN')
 
