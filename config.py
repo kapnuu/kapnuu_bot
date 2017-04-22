@@ -21,7 +21,7 @@ class Config:
 
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
-    REQUEST_TOKEN = os.environ.get('BOT_TOKEN')
+    REQUEST_TOKEN = os.environ.get('REQUEST_TOKEN')
 
 
 class ProductionConfig(Config):
