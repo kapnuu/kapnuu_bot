@@ -217,5 +217,5 @@ def huify_f(chat_id, huify, who):
     resp = 'OK, %s, your messages will be %s' % (who.get('first_name'), 'huified.' if huify else 'unhuified.')
 
     db.session.add(user)
-    db.commit()
+    db.session.commit()
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
