@@ -42,37 +42,43 @@ def process_request2():
 
 @app.route('/%s/hook' % config.Config.REQUEST_TOKEN, methods=['GET', 'POST'])
 def process_request():
-    data = request.json  # json.loads(request.data)
-    if data:
-        if 'message' in data:
-            message = data['message']
-            chat_id = message['chat']['id']
+    try:
+        data = request.json  # json.loads(request.data)
+        if data:
+            if 'message' in data:
+                message = data['message']
+                chat_id = message['chat']['id']
 
-            text = message['text'].lower()
-            if text.startswith('/start') or text == '/help':
-                return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
-            elif text == '/whoami':
-                return whoami_f(chat_id, message["from"].get("id"))
-            elif text == '/huify':
-                return huify_f(chat_id, True, message["from"])
-            elif text == '/unhuify':
-                return huify_f(chat_id, False, message["from"])
-            elif text == '/weather':
-                return weather_f(chat_id)
-            elif text.startswith('/currency'):
-                iso = text[10:]
-                if not iso:
-                    iso = 'usd'
-                return currency_f(iso, chat_id)
-            elif text == 'замучить котов'\
-                    or text == 'мучить котов'\
-                    or text == 'torture cats':
-                return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
-            elif text == '/now' or text == 'what time is it?':
-                return now_f(chat_id)
+                text = message['text'].lower()
+                if text.startswith('/start') or text == '/help':
+                    return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
+                elif text == '/whoami':
+                    return whoami_f(chat_id, message["from"].get("id"))
+                elif text == '/huify':
+                    return huify_f(chat_id, True, message["from"])
+                elif text == '/unhuify':
+                    return huify_f(chat_id, False, message["from"])
+                elif text == '/weather':
+                    return weather_f(chat_id)
+                elif text.startswith('/currency'):
+                    iso = text[10:]
+                    if not iso:
+                        iso = 'usd'
+                    return currency_f(iso, chat_id)
+                elif text == 'замучить котов'\
+                        or text == 'мучить котов'\
+                        or text == 'torture cats':
+                    return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
+                elif text == '/now' or text == 'what time is it?':
+                    return now_f(chat_id)
+                else:
+                    return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
             else:
-                return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
-
+                log.error('Mo `message` in request.json')
+        else:
+            log.error('request.json is None')
+    except Exception:
+        log.error('Something went wrong')
     abort(400)
 
 
