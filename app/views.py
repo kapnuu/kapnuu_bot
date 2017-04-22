@@ -114,7 +114,7 @@ def weather_f(chat_id=None):
         t = weather['main']['temp']
         resp = '''<b>%s</b>: %s%s°C %s / %s
 %s''' % (weather['name'], '-' if t < 0 else '', t, weather['weather'][0]['main'],
-         weather['weather'][0]['description'], dt(weather['dt']).strftime('%a %b %d %T %Y'))
+         weather['weather'][0]['description'], dt(weather['dt']).strftime('%a %b %d %H:%M %Y'))
     else:
         resp = 'WTF?'
 
@@ -144,7 +144,7 @@ def currency_f(iso, chat_id=None):
 
 @app.route('/now')
 def now_f(chat_id=None):
-    resp = datetime.datetime.now().strftime('%a %b %d %T %Y')
+    resp = datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
 
     if chat_id:
         # if random.choice([0, 1]) == 0:
