@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db
+from app import app, openweathermap, cbr, models, db, nn_traffic
 import calendar
 import datetime
 from flask import json, request, abort
@@ -66,6 +66,8 @@ def process_request():
                     return huify_f(chat_id, False, message["from"])
                 elif text == '/weather':
                     return weather_f(chat_id)
+                elif text == '/traffic':
+                    return nn_traffic_f(chat_id)
                 elif text.startswith('/currency'):
                     iso = text[10:]
                     if not iso:
@@ -171,18 +173,34 @@ def now_f(chat_id=None):
     return '<h1>%s</h1>' % resp
 
 
+@app.route('/traffic')
+def nn_traffic_f(chat_id=None):
+    resp = None
+    res = nn_traffic.get_traffic()
+    if res:
+        resp = '''<b>Nizhniy Novgorod</b> traffic jams level is <b>%s</b> point%s''' % (res[0], '' if res[0] == 1 else 's')
+        if res[1]:
+            resp += ': ' + res[1]
+    if chat_id:
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return '<pre>%s</pre>' % resp
+
+
 @app.route('/whoami')
-def whoami_f(chat_id=None, who_id=None):
+def whoami_f(chat_id=None, who=None):
+    who_id = who.get('id') if who else None
+    who_name = who.get('first_name') if who else 'Human'
     greet = None
     huify = False
     user = models.BotUser.query.filter_by(telegram_id=who_id).first()
     if user:
         greet = user.greet
         huify = user.huify
+        who_name = user.greet
 
-    resp = '''Hello, user #%s!
+    resp = '''Hello, %s!
     
-This feature in development now.''' % who_id
+This feature in development now.''' % who_name
     if huify:
         resp += '''
 
