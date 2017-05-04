@@ -33,12 +33,12 @@ def get_actual_value():
         minutes = (diff.days * 86400 + diff.seconds) / 60
         if minutes > actuality:
             response = requests.get(url)
-            log.info('current_weather1: %s' % response.text)
+            log.info('current_weather: %s' % response.text)
             weather = value.value = response.text
             value.last_updated = now
             db.session.add(value)
             db.session.commit()
-            log.info('Updated `data` item: currency at %s' % now)
+            log.info('Updated `data` item: weather at %s' % now)
         else:
             weather = value.value
 

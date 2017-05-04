@@ -175,10 +175,10 @@ def now_f(chat_id=None):
 
 @app.route('/traffic')
 def nn_traffic_f(chat_id=None):
-    resp = None
-    res = nn_traffic.get_traffic()
+    resp = '''I don't know :('''
+    res = nn_traffic.current_traffic()
     if res:
-        resp = '''<b>Nizhniy Novgorod</b> traffic jams level is <b>%s</b> point%s''' % (res[0], '' if res[0] == 1 else 's')
+        resp = '''<b>Nizhniy Novgorod</b> traffic jams level is <b>%s</b> pt%s''' % (res[0], '' if res[0] == 1 else 's')
         if res[1]:
             resp += ': ' + res[1]
     if chat_id:
