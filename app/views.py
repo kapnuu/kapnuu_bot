@@ -144,9 +144,9 @@ def weather_f(chat_id=None):
         ico = 'https://%s.herokuapp.com/weather-ico/%s.png' % (config.Config.HEROKU_APP_NAME,
                                                                weather['weather'][0]['icon'])
         t = weather['main']['temp']
-        resp = '''<a href="%s">%s</a>
-<b>%s</b>: %s%s°C %s
-%s UTC''' % (ico, weather['weather'][0]['main'], weather['name'], '-' if t < 0 else '', t,
+        resp = '''<a href="%s"><b>%s</b>: %s</a>
+%s%s°C %s
+%s UTC''' % (ico, weather['name'], weather['weather'][0]['main'], '-' if t < 0 else '', t,
              weather['weather'][0]['description'].capitalize(), dt(weather['dt']).strftime('%a %b %d %H:%M %Y'))
     else:
         resp = 'WTF?'
