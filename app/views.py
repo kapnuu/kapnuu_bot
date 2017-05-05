@@ -25,13 +25,13 @@ def favicon():
     abort(404)
 
 
-def send_reply(resp):
+def send_reply(resp, mimetype='application/json'):
     if 'method' not in resp:
         resp['method'] = 'sendMessage'
     return app.response_class(
         response=json.dumps(resp),
         status=200,
-        mimetype='application/json'
+        mimetype=mimetype
     )
 
 
@@ -79,6 +79,8 @@ def process_request():
                     return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
                 elif text == '/now' or text == 'what time is it?':
                     return now_f(chat_id)
+                elif text == '/test':
+                    return test_img_f(chat_id)
                 else:
                     return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
             else:
@@ -241,3 +243,11 @@ def huify_f(chat_id, huify, who):
     db.session.add(user)
     db.session.commit()
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+
+
+def test_img_f(chat_id):
+    return send_reply({'method': 'sendPhoto',
+                       'chat_id': chat_id,
+                       'parse_mode': 'html',
+                       'photo': 'https://avatars1.githubusercontent.com/u/12820737?v=3&s=460'},
+                      'multipart/form-data')
