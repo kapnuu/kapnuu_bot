@@ -149,7 +149,12 @@ def weather_f(chat_id=None):
         resp = 'WTF?'
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        send_reply({'method': 'sendPhoto',
+                    'chat_id': chat_id,
+                    'caption': weather['main']['temp'],
+                    'photo': 'https://%s.herokuapp.com/weather-ico/%s.png' % (config.Config.HEROKU_APP_NAME,
+                                                                              weather['weather'][0]['icon'])})
+        # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
 
 
@@ -258,5 +263,5 @@ def test_img_f(chat_id):
                       'chat_id': chat_id,
                       'caption': 'Test',
                       'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'})
-    log.info(ret)
+    # log.info(ret)
     return ret
