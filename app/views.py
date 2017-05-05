@@ -249,7 +249,7 @@ def test_img_f(chat_id):
     ret = send_reply({'method': 'sendPhoto',
                       'chat_id': chat_id,
                       'caption': 'Test',
-                      'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'},
-                      'multipart/form-data')
+                      'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'})#,
+                      #'multipart/form-data')
     log.info(ret)
     return ret
