@@ -146,7 +146,7 @@ def weather_f(chat_id=None):
         t = weather['main']['temp']
         resp = '''<b>%s</b>: <a href="%s">%s</a>
 %s%s°C %s
-%s UTC''' % (ico, weather['name'], weather['weather'][0]['main'], '-' if t < 0 else '', t,
+%s UTC''' % (weather['name'], ico, weather['weather'][0]['main'], '-' if t < 0 else '', t,
              weather['weather'][0]['description'].capitalize(), dt(weather['dt']).strftime('%a %b %d %H:%M %Y'))
     else:
         resp = 'WTF?'
