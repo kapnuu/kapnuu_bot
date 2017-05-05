@@ -23,6 +23,8 @@ class Config:
 
     REQUEST_TOKEN = os.environ.get('REQUEST_TOKEN')
 
+    HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
+
 
 class ProductionConfig(Config):
     DEBUG = False

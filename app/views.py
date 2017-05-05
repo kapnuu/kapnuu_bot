@@ -17,6 +17,7 @@ def ut(d): return calendar.timegm(d.timetuple())
 
 @app.route('/')
 def index():
+    log.info('HEROKU_APP_NAME is %s' % config.Config.HEROKU_APP_NAME)
     return 'It works'
 
 
@@ -25,13 +26,13 @@ def favicon():
     abort(404)
 
 
-def send_reply(resp, mimetype='application/json'):
+def send_reply(resp):
     if 'method' not in resp:
         resp['method'] = 'sendMessage'
     return app.response_class(
         response=json.dumps(resp),
         status=200,
-        mimetype=mimetype
+        mimetype='application/json'
     )
 
 
@@ -249,7 +250,6 @@ def test_img_f(chat_id):
     ret = send_reply({'method': 'sendPhoto',
                       'chat_id': chat_id,
                       'caption': 'Test',
-                      'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'})#,
-                      #'multipart/form-data')
+                      'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'})
     log.info(ret)
     return ret
