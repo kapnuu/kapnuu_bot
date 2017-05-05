@@ -155,7 +155,7 @@ def weather_f(chat_id=None):
         log.info(ico)
         return send_reply({'method': 'sendPhoto',
                     'chat_id': chat_id,
-                    'caption': weather['weather'][0]['description'],
+                    'caption': resp,
                     'photo': ico})
         # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
