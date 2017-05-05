@@ -149,6 +149,8 @@ def weather_f(chat_id=None):
         resp = 'WTF?'
 
     if chat_id:
+        log.info('https://%s.herokuapp.com/weather-ico/%s.png' % (config.Config.HEROKU_APP_NAME,
+                                                                  weather['weather'][0]['icon']))
         send_reply({'method': 'sendPhoto',
                     'chat_id': chat_id,
                     'caption': weather['main']['temp'],
