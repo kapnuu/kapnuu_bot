@@ -151,6 +151,8 @@ def weather_f(chat_id=None):
     else:
         resp = 'WTF?'
 
+    log.info(resp)
+
     if chat_id:
         # return send_reply({'method': 'sendPhoto',
         #            'chat_id': chat_id,
