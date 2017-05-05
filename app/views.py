@@ -153,7 +153,7 @@ def weather_f(chat_id=None):
                                                                   weather['weather'][0]['icon']))
         send_reply({'method': 'sendPhoto',
                     'chat_id': chat_id,
-                    'caption': weather['main']['temp'],
+                    'caption': weather['weather'][0]['description'],
                     'photo': 'https://%s.herokuapp.com/weather-ico/%s.png' % (config.Config.HEROKU_APP_NAME,
                                                                               weather['weather'][0]['icon'])})
         # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
