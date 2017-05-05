@@ -246,7 +246,9 @@ def huify_f(chat_id, huify, who):
 
 
 def test_img_f(chat_id):
-    return send_reply({'method': 'sendPhoto',
+    ret = send_reply({'method': 'sendPhoto',
                        'chat_id': chat_id,
                        'photo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bierbrauer.jpg/220px-Bierbrauer.jpg'},
                       'multipart/form-data')
+    log.info(ret)
+    return ret
