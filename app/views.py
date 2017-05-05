@@ -1,10 +1,11 @@
 from app import app, openweathermap, cbr, models, db, nn_traffic
 import calendar
 import datetime
-from flask import json, request, abort
+from flask import json, request, abort, send_from_directory
 import logging
 import random
 import config
+from os import path
 
 log = logging.getLogger('app')
 
@@ -17,13 +18,19 @@ def ut(d): return calendar.timegm(d.timetuple())
 
 @app.route('/')
 def index():
-    log.info('HEROKU_APP_NAME is %s' % config.Config.HEROKU_APP_NAME)
+    # log.info('HEROKU_APP_NAME is %s' % config.Config.HEROKU_APP_NAME)
     return 'It works'
 
 
 @app.route('/favicon.ico')
 def favicon():
     abort(404)
+
+
+@app.route('/weather-ico/<ico>')
+def weather_ico(ico):
+    return send_from_directory(path.join(app.root_path, 'static/weather-ico'),
+                               ico)
 
 
 def send_reply(resp):
