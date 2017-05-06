@@ -161,9 +161,11 @@ def weather_f(chat_id=None):
             #            'chat_id': chat_id,
             #            'caption': resp,
             #            'photo': ico})
-            resp = '''<b>%s</b>: <a href="%sweather">%s</a> <b>%s</b>
-%s UTC''' % (city, t, base_url, main, timestamp)
-            return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp, 'disable_web_page_preview': False})
+            res = '''<b>%s</b>: <a href="%sweather">%s</a> <b>%s</b>
+%s UTC''' % (city, base_url, t, main, timestamp)
+            ret = send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
+            log.info(ret)
+            return ret
 
         return render_template('weather.html', temp=t, base_url=base_url, ico=ico, main=main,
                                city=city, description=description, timestamp=timestamp)
