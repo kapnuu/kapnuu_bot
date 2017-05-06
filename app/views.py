@@ -161,8 +161,8 @@ def weather_f(chat_id=None):
             #            'chat_id': chat_id,
             #            'caption': resp,
             #            'photo': ico})
-            res = '''<b>%s</b>: <a href="%sweather">%s</a> <b>%s</b>
-%s UTC''' % (city, base_url, t, main, timestamp)
+            res = '''<b>%s</b>: <a href="%sweather?%s">%s</a> <b>%s</b>
+%s UTC''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
             ret = send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
             log.info(ret)
             return ret
