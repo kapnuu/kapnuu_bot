@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns#">
+<html lang="en" prefix="og: http://ogp.me/ns#" itemscope itemtype="http://schema.org/WebPage">
 <head>
     <meta charset="UTF-8">
     <title>{{ temp }} {{ main }}</title>
@@ -11,9 +11,9 @@
     <link href="{{ base_url }}static/main.css" rel="stylesheet">
 </head>
 <body>
-<div itemscope itemtype="http://schema.org/ImageObject">
+<div>
     <div class="ico">
-        <img src="{{ base_url }}{{ ico }}" alt="{{ main }}" title="{{ main }}" itemprop="contentUrl" />
+        <img src="{{ base_url }}{{ ico }}" alt="{{ main }}" title="{{ main }}" itemprop="image" />
     </div>
     <div class="descr" itemprop="description">
         <strong>{{ city }}</strong><br/>
