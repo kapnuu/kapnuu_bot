@@ -142,7 +142,7 @@ def weather_f(chat_id=None):
         log.info(weather)
 
         if config.Config.HEROKU_APP_NAME:
-            base_url = 'https://%s.herokuapp.com' % config.Config.HEROKU_APP_NAME
+            base_url = 'https://%s.herokuapp.com/' % config.Config.HEROKU_APP_NAME
         else:
             base_url = '/'
 
@@ -163,7 +163,7 @@ def weather_f(chat_id=None):
             #            'photo': ico})
             resp = '''<b>%s</b>: <a href="%s">%s</a>
 %s %s
-%s UTC''' % (city, '%s/weather/' % base_url, main, t, description, timestamp)
+%s UTC''' % (city, '%sweather/' % base_url, main, t, description, timestamp)
             return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
         return render_template('weather.html', temp=t, base_url=base_url, ico=ico, main=main,
