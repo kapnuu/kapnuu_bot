@@ -10,7 +10,8 @@ from os import path
 log = logging.getLogger('app')
 
 #TODO use user timezone
-tz_offset = 3 * 60 * 60
+tz_offset = 3 * 60 * 60 - app.config.get('BOT_TZ_OFFSET')
+
 
 def dt(u): return datetime.datetime.fromtimestamp(u)
 

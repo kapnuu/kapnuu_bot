@@ -25,6 +25,8 @@ class Config:
 
     HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
 
+    BOT_TZ_OFFSET = os.environ.get('BOT_TZ_OFFSET')
+
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -34,3 +36,4 @@ class DevelopConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
     REQUEST_TOKEN = '2128506'
+    BOT_TZ_OFFSET = 3 * 60 * 60
