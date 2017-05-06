@@ -1,7 +1,7 @@
 from app import app, openweathermap, cbr, models, db, nn_traffic
 import calendar
 import datetime
-from flask import json, request, abort, send_from_directory
+from flask import json, request, abort, send_from_directory, render_template
 import logging
 import random
 import config
@@ -137,29 +137,41 @@ Thanks, <i>kapnuu bot</i>
 
 @app.route('/weather', methods=['GET'])
 def weather_f(chat_id=None):
-    resp = None
-
     weather = openweathermap.current_weather()
     if weather:
-        ico = 'https://%s.herokuapp.com/weather-ico/%s.png' % (config.Config.HEROKU_APP_NAME,
-                                                               weather['weather'][0]['icon'])
+        log.info(weather)
+
+        if config.Config.HEROKU_APP_NAME:
+            base_url = 'https://%s.herokuapp.com' % config.Config.HEROKU_APP_NAME
+        else:
+            base_url = '/'
+
+        ico = 'weather-ico/%s.png' % weather['weather'][0]['icon']
+
         t = weather['main']['temp']
-        resp = '''<b>%s</b>: <a href="%s">%s</a>
-%s%s°C %s
-%s UTC''' % (weather['name'], ico, weather['weather'][0]['main'], '-' if t < 0 else '', t,
-             weather['weather'][0]['description'].capitalize(), dt(weather['dt']).strftime('%a %b %d %H:%M %Y'))
+        t = '%s%s°C' % ('-' if t < 0 else '', t)
+
+        city = weather['name']
+        main = weather['weather'][0]['main']
+        description = weather['weather'][0]['description'].capitalize()
+        timestamp = dt(weather['dt']).strftime('%a %b %d %H:%M %Y')
+
+        if chat_id:
+            # return send_reply({'method': 'sendPhoto',
+            #            'chat_id': chat_id,
+            #            'caption': resp,
+            #            'photo': ico})
+            resp = '''<b>%s</b>: <a href="%s">%s</a>
+%s %s
+%s UTC''' % (city, '%sweather/' % base_url, main, t, description, timestamp)
+            return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        
+        return render_template('weather.html', title='%s %s' % (t, main), base_url=base_url, ico=ico, main=main,
+                               city=city, description=description, timestamp=timestamp)
     else:
-        resp = 'WTF?'
+        log.error('Failed to get current weather')
+        abort(500)
 
-    log.info(resp)
-
-    if chat_id:
-        # return send_reply({'method': 'sendPhoto',
-        #            'chat_id': chat_id,
-        #            'caption': resp,
-        #            'photo': ico})
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
-    return '<h1>%s</h1>' % resp
 
 
 @app.route('/currency/<iso>', methods=['GET'])

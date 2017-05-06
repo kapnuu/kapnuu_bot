@@ -13,8 +13,21 @@ url = 'http://api.openweathermap.org/data/2.5/weather?id=%s&appid=%s&units=metri
           (config.Config.OWM_CITYID, config.Config.OWM_APIKEY)
 
 
+def verify_config():
+    if config.Config.OWM_APIKEY is None:
+        val = models.Data.query.filter_by(key='OWM_APIKEY').first()
+        config.Config.OWM_APIKEY = val.value if val else None
+        val = models.Data.query.filter_by(key='OWM_CITYID').first()
+        config.Config.OWM_CITYID = val.value if val else None
+
+        global url
+        url = 'http://api.openweathermap.org/data/2.5/weather?id=%s&appid=%s&units=metric' % \
+              (config.Config.OWM_CITYID, config.Config.OWM_APIKEY)
+
+
 def get_actual_value():
     weather = None
+    verify_config()
     now = datetime.datetime.now()
     value = models.Data.query.filter_by(key='weather', param=str(config.Config.OWM_CITYID)).first()
     if value is None:
