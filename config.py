@@ -25,7 +25,7 @@ class Config:
 
     HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
 
-    BOT_TZ_OFFSET = os.environ.get('BOT_TZ_OFFSET')
+    BOT_TZ_OFFSET = int(os.environ.get('BOT_TZ_OFFSET'))
 
 
 class ProductionConfig(Config):
