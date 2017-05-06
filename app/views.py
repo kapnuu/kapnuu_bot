@@ -163,7 +163,7 @@ def weather_f(chat_id=None):
             #            'photo': ico})
             resp = '''<b>%s</b>: <a href="%s">%s</a>
 %s %s
-%s UTC''' % (city, '%sweather/' % base_url, main, t, description, timestamp)
+%s UTC''' % (city, '%s/weather/' % base_url, main, t, description, timestamp)
             return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
         return render_template('weather.html', temp=t, base_url=base_url, ico=ico, main=main,
@@ -171,7 +171,6 @@ def weather_f(chat_id=None):
     else:
         log.error('Failed to get current weather')
         abort(500)
-
 
 
 @app.route('/currency/<iso>', methods=['GET'])
@@ -209,9 +208,9 @@ def nn_traffic_f(chat_id=None):
     resp = '''I don't know :('''
     res = nn_traffic.current_traffic()
     if res:
-        resp = '''<b>Nizhniy Novgorod</b> traffic jams level is <b>%s</b> pt%s''' % (res[0], '' if res[0] == 1 else 's')
+        resp = '''<b>Nizhniy Novgorod</b>: traffic jams level is <b>%s</b> pt%s''' % (res[0], '' if res[0] == 1 else 's')
         if res[1]:
-            resp += ': ' + res[1]
+            resp += ' — ' + res[1]
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
