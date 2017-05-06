@@ -9,6 +9,8 @@ from os import path
 
 log = logging.getLogger('app')
 
+#TODO use user timezone
+tz_offset = 180
 
 def dt(u): return datetime.datetime.fromtimestamp(u)
 
@@ -152,7 +154,7 @@ def weather_f(chat_id=None):
         city = weather['name']
         main = weather['weather'][0]['main']
         description = weather['weather'][0]['description'].capitalize()
-        timestamp = dt(weather['dt']).strftime('%a %b %d %H:%M %Y')
+        timestamp = dt(weather['dt'] + tz_offset).strftime('%a %b %d %H:%M %Y')
 
         wind = 'Wind'
         if 'deg' in weather['wind']:
@@ -177,8 +179,8 @@ def weather_f(chat_id=None):
 
             wind += ' wind,'
 
-        sunrise = weather['sys']['sunrise']
-        sunset = weather['sys']['sunset']
+        sunrise = weather['sys']['sunrise'] + tz_offset
+        sunset = weather['sys']['sunset'] + tz_offset
         day_d = sunset - sunrise
         seconds = day_d % 60
         minutes = int((day_d - seconds) / 60 + seconds / 60) % 60
@@ -194,7 +196,7 @@ def weather_f(chat_id=None):
             #            'caption': resp,
             #            'photo': ico})
             res = '''<b>%s</b>: <a href="%sweather?%s">%s, %s</a>
-%s UTC''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
+%s''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
             ret = send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
             log.info(ret)
             return ret
