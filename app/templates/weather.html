@@ -11,11 +11,11 @@
     <link href="{{ base_url }}static/main.css" rel="stylesheet">
 </head>
 <body>
-<div>
+<div itemscope itemtype="http://schema.org/ImageObject">
     <div class="ico">
-        <img src="{{ base_url }}{{ ico }}" alt="{{ main }}" title="{{ main }}" />
+        <img src="{{ base_url }}{{ ico }}" alt="{{ main }}" title="{{ main }}" itemprop="contentUrl" />
     </div>
-    <div class="descr">
+    <div class="descr" itemprop="description">
         <strong>{{ city }}</strong><br/>
         <span class="temp">{{ temp }}</span> {{ description }}<br/>
         {{ timestamp }} UTC
