@@ -18,7 +18,6 @@ def ut(d): return calendar.timegm(d.timetuple())
 
 @app.route('/')
 def index():
-    # log.info('HEROKU_APP_NAME is %s' % config.Config.HEROKU_APP_NAME)
     return 'It works'
 
 
@@ -27,10 +26,9 @@ def favicon():
     abort(404)
 
 
-@app.route('/weather-ico/<ico>')
+@app.route('/weather/ico/<ico>')
 def weather_ico(ico):
-    return send_from_directory(path.join(app.root_path, 'static/weather-ico'),
-                               ico)
+    return send_from_directory(path.join(app.root_path, 'static/weather-ico'), ico)
 
 
 def send_reply(resp):
@@ -146,7 +144,7 @@ def weather_f(chat_id=None):
         else:
             base_url = '/'
 
-        ico = 'weather-ico/%s.png' % weather['weather'][0]['icon']
+        ico = 'weather/ico/%s.png' % weather['weather'][0]['icon']
 
         t = weather['main']['temp']
         t = '%s%s°C' % ('-' if t < 0 else '', t)
@@ -155,6 +153,40 @@ def weather_f(chat_id=None):
         main = weather['weather'][0]['main']
         description = weather['weather'][0]['description'].capitalize()
         timestamp = dt(weather['dt']).strftime('%a %b %d %H:%M %Y')
+
+        wind = 'Wind'
+        if 'deg' in weather['wind']:
+            deg = weather['wind']['deg']
+
+            if deg >= 338 or deg <= 22:
+                wind = 'Northern'
+            elif deg <= 67:
+                wind = 'North-Eastern'
+            elif deg <= 112:
+                wind = 'Eastern'
+            elif deg <= 157:
+                wind = 'South-Eastern'
+            elif deg <= 202:
+                wind = 'Southern'
+            elif deg <= 247:
+                wind = 'South-Western'
+            elif deg <= 292:
+                wind = 'Western'
+            elif deg <= 337:
+                wind = 'North-Western'
+
+            wind += ' wind,'
+
+        sunrise = weather['sys']['sunrise']
+        sunset = weather['sys']['sunset']
+        day_d = sunset - sunrise
+        seconds = day_d % 60
+        minutes = int((day_d - seconds) / 60 + seconds / 60) % 60
+        hours = (day_d - minutes * 60) // 60 // 60
+
+        details = '%s %s&nbsp;mph. Clouds %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' %\
+                  (wind, weather['wind']['speed'], weather['clouds']['all'], hours, minutes,
+                   dt(sunrise).strftime('%H:%M'), dt(sunset).strftime('%H:%M'))
 
         if chat_id:
             # return send_reply({'method': 'sendPhoto',
@@ -168,7 +200,7 @@ def weather_f(chat_id=None):
             return ret
 
         return render_template('weather.html', temp=t, base_url=base_url, ico=ico, main=main,
-                               city=city, description=description, timestamp=timestamp)
+                               city=city, description=description, timestamp=timestamp, details=details)
     else:
         log.error('Failed to get current weather')
         abort(500)
