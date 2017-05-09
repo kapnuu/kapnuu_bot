@@ -188,7 +188,7 @@ def weather_f(chat_id=None):
         hours = (day_d - minutes * 60) // 60 // 60
 
         details = '%s %s&nbsp;mph. Clouds %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' %\
-                  (wind, weather['wind']['speed'], weather['clouds']['all'], hours, minutes,
+                  (wind, weather['wind']['speed'], weather['clouds']['all'], hours, str(minutes).zfill(2),
                    dt(sunrise).strftime('%H:%M'), dt(sunset).strftime('%H:%M'))
 
         if chat_id:
