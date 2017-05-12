@@ -122,7 +122,7 @@ def start_f(chat_id=None, who=None):
         if user is None:
             user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
             db.session.add(user)
-            db.session.commmit()
+            db.session.commit()
 
     responses = ['Hello, %s!',
                  'Hi there, %s.',
@@ -131,7 +131,7 @@ def start_f(chat_id=None, who=None):
                  'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
-    hi = random.choice(responses) % (who if who else 'Human')
+    hi = random.choice(responses) % (name if name else 'Human')
 
     resp = '''%s
 Sorry, I am not very useful bot, I'm just a my creator's helper: now he is learning how to develop telegram bots.
