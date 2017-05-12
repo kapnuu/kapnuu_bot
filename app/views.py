@@ -113,12 +113,13 @@ def start_f(chat_id=None, who=None):
         db.session.delete(me)
         db.session.commit()
 
+
     first_name = None
     if who is not None:
         t_id = who.get('id')
         first_name = who.get('first_name')
         username = who.get('username')
-        last_name = who.get('first_lame')
+        last_name = who.get('last_name')
 
         name = first_name
         if username:
