@@ -66,13 +66,13 @@ def process_request():
 
                 text = message['text'].lower()
                 if text.startswith('/start') or text == '/help':
-                    return start_f(chat_id, message["from"])
+                    return start_f(chat_id, message['from'])
                 elif text == '/whoami':
-                    return whoami_f(chat_id, message["from"])
+                    return whoami_f(chat_id, message['from'])
                 elif text == '/huify':
-                    return huify_f(chat_id, True, message["from"])
+                    return huify_f(chat_id, True, message['from'])
                 elif text == '/unhuify':
-                    return huify_f(chat_id, False, message["from"])
+                    return huify_f(chat_id, False, message['from'])
                 elif text == '/weather':
                     return weather_f(chat_id)
                 elif text == '/traffic':
@@ -88,6 +88,8 @@ def process_request():
                     return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
                 elif text == '/now' or text == 'what time is it?':
                     return now_f(chat_id)
+                elif text == '/whoareallthesefpeople':
+                    return whoareallthesefpeople_f(chat_id)
                 elif text == '/test':
                     return test_img_f(chat_id)
                 else:
@@ -104,6 +106,7 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None, who=None):
 
+    first_name = None
     if who is not None:
         t_id = who.get('id')
         first_name = who.get('first_name')
@@ -116,7 +119,7 @@ def start_f(chat_id=None, who=None):
         if last_name:
             name = '%s %s' % (name, last_name)
 
-        log.info('User #%s %s', (t_id, name))
+        log.info('User #%s %s' % (t_id, name))
 
         user = models.BotUser.query.filter_by(telegram_id=t_id).first()
         if user is None:
@@ -131,7 +134,7 @@ def start_f(chat_id=None, who=None):
                  'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
-    hi = random.choice(responses) % (name if name else 'Human')
+    hi = random.choice(responses) % (first_name if first_name else 'Human')
 
     resp = '''%s
 Sorry, I am not very useful bot, I'm just a my creator's helper: now he is learning how to develop telegram bots.
@@ -228,8 +231,6 @@ def weather_f(chat_id=None):
 
 @app.route('/currency/<iso>', methods=['GET'])
 def currency_f(iso, chat_id=None):
-    resp = None
-
     iso = iso.lower()
     if iso == 'rur':
         resp = '1 RUR is 1 RUR, dude!'
@@ -250,8 +251,6 @@ def now_f(chat_id=None):
     resp = '%s UTC' % datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
 
     if chat_id:
-        # if random.choice([0, 1]) == 0:
-        #    return send_reply({'chat_id': chat_id, 'sticker': 'BQADAgADeAcAAlOx9wOjY2jpAAHq9DUC'})
         return send_reply({'chat_id': chat_id, 'text': resp})
     return '<h1>%s</h1>' % resp
 
@@ -277,9 +276,10 @@ def whoami_f(chat_id=None, who=None):
     huify = False
     user = models.BotUser.query.filter_by(telegram_id=who_id).first()
     if user:
-        greet = user.greet
+        if user.greet:
+            greet = user.greet
+            who_name = user.greet
         huify = user.huify
-        who_name = user.greet
 
     resp = '''Hello, %s!
     
@@ -324,6 +324,23 @@ def huify_f(chat_id, huify, who):
     db.session.add(user)
     db.session.commit()
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+
+
+@app.route('/whoareallthesefpeople')
+def whoareallthesefpeople_f(chat_id=None):
+    users = models.BotUser.query.all()
+    if users and len(users):
+        resp = 'Here they are:'
+        for user in users:
+            resp += '''
+%s
+''' % user.name
+    else:
+        resp = 'No one is here'
+
+    if chat_id:
+        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return '<pre>%s</pre>' % resp
 
 
 def test_img_f(chat_id):
