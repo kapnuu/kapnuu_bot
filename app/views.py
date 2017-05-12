@@ -122,7 +122,7 @@ def start_f(chat_id=None, who=None):
         log.info('User #%s %s' % (t_id, name))
 
         user = models.BotUser.query.filter_by(telegram_id=t_id).first()
-        if user is None:
+        if user is None or user.name is None:
             user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
             db.session.add(user)
             db.session.commit()
@@ -270,6 +270,27 @@ def nn_traffic_f(chat_id=None):
 
 @app.route('/whoami')
 def whoami_f(chat_id=None, who=None):
+
+    if who is not None:
+        t_id = who.get('id')
+        first_name = who.get('first_name')
+        username = who.get('username')
+        last_name = who.get('first_lame')
+
+        name = first_name
+        if username:
+            name = '%s %s' % (name, username)
+        if last_name:
+            name = '%s %s' % (name, last_name)
+
+        log.info('User #%s %s' % (t_id, name))
+
+        user = models.BotUser.query.filter_by(telegram_id=t_id).first()
+        if user is None or user.name is None:
+            user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
+            db.session.add(user)
+            db.session.commit()
+
     who_id = who.get('id') if who else None
     who_name = who.get('first_name') if who else 'Human'
     greet = None
