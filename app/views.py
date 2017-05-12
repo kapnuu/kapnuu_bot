@@ -108,6 +108,11 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None, who=None):
 
+    me = models.BotUser.query.filter_by(telegram_id=314473825).first
+    if me is not None:
+        db.session.delete(me)
+        db.session.commit()
+
     first_name = None
     if who is not None:
         t_id = who.get('id')
@@ -124,9 +129,12 @@ def start_f(chat_id=None, who=None):
         log.info('User #%s %s' % (t_id, name))
 
         user = models.BotUser.query.filter_by(telegram_id=t_id).first()
-        if user is None or user.name is None:
+        if user is None:
             user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
             db.session.add(user)
+            db.session.commit()
+        elif user.name is None:
+            user.name = name
             db.session.commit()
 
     responses = ['Hello, %s!',
@@ -288,9 +296,12 @@ def whoami_f(chat_id=None, who=None):
         log.info('User #%s %s' % (t_id, name))
 
         user = models.BotUser.query.filter_by(telegram_id=t_id).first()
-        if user is None or user.name is None:
+        if user is None:
             user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
             db.session.add(user)
+            db.session.commit()
+        elif user.name is None:
+            user.name = name
             db.session.commit()
 
     who_id = who.get('id') if who else None
