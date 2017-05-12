@@ -66,9 +66,9 @@ def process_request():
 
                 text = message['text'].lower()
                 if text.startswith('/start') or text == '/help':
-                    return start_f(chat_id, message["from"].get("first_name"), message["from"].get("id"))
+                    return start_f(chat_id, message["from"])
                 elif text == '/whoami':
-                    return whoami_f(chat_id, message["from"].get("id"))
+                    return whoami_f(chat_id, message["from"])
                 elif text == '/huify':
                     return huify_f(chat_id, True, message["from"])
                 elif text == '/unhuify':
@@ -102,10 +102,27 @@ def process_request():
 
 
 @app.route('/start')
-def start_f(chat_id=None, who=None, who_id=None):
+def start_f(chat_id=None, who=None):
 
-    if not who and not who_id:
-        log.info('User #%s %s', (who_id, who))
+    if who is not None:
+        t_id = who.get('id')
+        first_name = who.get('first_name')
+        username = who.get('username')
+        last_name = who.get('first_lame')
+
+        name = first_name
+        if username:
+            name = '%s %s' % (name, username)
+        if last_name:
+            name = '%s %s' % (name, last_name)
+
+        log.info('User #%s %s', (t_id, name))
+
+        user = models.BotUser.query.filter_by(telegram_id=t_id).first()
+        if user is None:
+            user = models.BotUser(telegram_id=t_id, name=name, huify=False, owm_city=config.Config.OWM_CITYID)
+            db.session.add(user)
+            db.session.commmit()
 
     responses = ['Hello, %s!',
                  'Hi there, %s.',
