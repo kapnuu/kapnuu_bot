@@ -108,7 +108,7 @@ def process_request():
 @app.route('/start')
 def start_f(chat_id=None, who=None):
 
-    me = models.BotUser.query.filter_by(telegram_id=314473825).first
+    me = models.BotUser.query.filter_by(telegram_id=314473825).first()
     if me is not None:
         db.session.delete(me)
         db.session.commit()
