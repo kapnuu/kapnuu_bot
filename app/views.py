@@ -71,6 +71,8 @@ def process_request():
                     return whoami_f(chat_id, message['from'])
                 elif text == '/huify':
                     return huify_f(chat_id, True, message['from'])
+                elif text.startswith('/huify'):
+                    return send_reply({'chat_id': chat_id, 'text': 'Катя Олеговна, хуификатор пока не работает'})
                 elif text == '/unhuify':
                     return huify_f(chat_id, False, message['from'])
                 elif text == '/weather':
@@ -354,8 +356,7 @@ def whoareallthesefpeople_f(chat_id=None):
         resp = 'Here they are:'
         for user in users:
             resp += '''
-%s
-''' % user.name
+%s %s''' % (user.telegram_id, user.name)
     else:
         resp = 'No one is here'
 
