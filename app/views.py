@@ -97,6 +97,8 @@ def process_request():
                     return now_f(chat_id)
                 elif text == '/whoareallthesefpeople':
                     return whoareallthesefpeople_f(chat_id)
+                elif text == u'\UF09F8DBA' or  text == u'\UF09F8DBB':
+                    return beer_f(chat_id, message['from'])
                 elif text == '/test':
                     return test_img_f(chat_id)
                 else:
@@ -112,11 +114,6 @@ def process_request():
 
 @app.route('/start')
 def start_f(chat_id=None, who=None):
-
-    me = models.BotUser.query.filter_by(telegram_id=314473825).first()
-    if me is not None:
-        db.session.delete(me)
-        db.session.commit()
 
     first_name = None
     if who is not None:
@@ -385,6 +382,19 @@ def whoareallthesefpeople_f(chat_id=None):
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
+
+
+def beer_f(chat_id, who=None):
+    greet = 'Human'
+    if who:
+        user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
+        if user:
+            greet = user.greet if user.greet else user.name
+        elif who.get('first_name'):
+            greet = who.get('first_name')
+
+    resp = '%s, %s' % (greet, u'\UF09F8DBB')
+    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
 def test_img_f(chat_id):
