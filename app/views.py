@@ -33,6 +33,10 @@ def favicon():
 def weather_ico(ico):
     return send_from_directory(path.join(app.root_path, 'static/weather-ico'), ico)
 
+@app.route('/traffic/ico/<ico>')
+def weather_ico(ico):
+    return send_from_directory(path.join(app.root_path, 'static/traffic-ico'), ico)
+
 
 def send_reply(resp):
     if 'method' not in resp:
@@ -277,7 +281,7 @@ def nn_traffic_f(chat_id=None):
         ret = send_reply({'method': 'sendPhoto',
                           'chat_id': chat_id,
                           'caption': 'Nizhniy Novgorod: %s' % res[1],
-                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic-ico/traffic%s.png' % res[0]})
+                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]})
         return ret
         # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp
