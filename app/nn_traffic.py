@@ -5,16 +5,17 @@ import datetime
 from app import models, db
 
 traffic_descriptions = [
-    'Дороги свободны',
-    'Дороги почти свободны',
-    'Местами затруднения',
-    'Местами затруднения',
-    'Движение плотное',
-    'Движение затруднённое',
-    'Серьёзные пробки',
-    'Многокилометровые пробки',
-    'Город стоит',
-    'Пешком быстрее',
+    'Traffic is moving freely',             # 0 'Дороги свободны',
+    'Traffic is moving freely',             # 1 'Дороги свободны',
+    'Traffic is moving fairly freely',      # 2 'Дороги почти свободны',
+    'Areas of congestion',                  # 3 'Местами затруднения',
+    'Areas of congestion',                  # 4 'Местами затруднения',
+    'Traffic is heavy',                     # 5 'Движение плотное',
+    'Traffic is backed up',                 # 6 'Движение затруднённое',
+    'There are serious jams',               # 7 'Серьёзные пробки',
+    'Jams extend for several km',           # 8 'Многокилометровые пробки',
+    'Traffic is at a complete standstill',  # 9 'Город стоит',
+    'Faster to walk',                       # 10 'Пешком быстрее',
 ]
 
 log = logging.getLogger('app')
@@ -34,7 +35,6 @@ def get_traffic():
 
 
 def get_actual_value():
-    traffic = None
     now = datetime.datetime.now()
     value = models.Data.query.filter_by(key='traffic').first()
     if value is None:
@@ -61,7 +61,7 @@ def get_actual_value():
 
     if traffic:
         if 0 < traffic <= len(traffic_descriptions):
-            traffic = (traffic, traffic_descriptions[traffic - 1])
+            traffic = (traffic, traffic_descriptions[traffic])
             log.info('current_traffic: %s %s' % (traffic[0], traffic[1]))
 
     return traffic

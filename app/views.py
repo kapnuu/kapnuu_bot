@@ -113,7 +113,6 @@ def start_f(chat_id=None, who=None):
         db.session.delete(me)
         db.session.commit()
 
-
     first_name = None
     if who is not None:
         t_id = who.get('id')
@@ -160,7 +159,7 @@ You can get info by sending these commands:
 
 Thanks, <i>kapnuu bot</i>
 
-<b>P. S.</b> And do not try to torture cats. Never. NEVER!''' % hi
+<b>P. S.</b> And do not try to <b>torture cats</b>. Never. NEVER!''' % hi
 
     if chat_id:
         return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
@@ -268,15 +267,20 @@ def now_f(chat_id=None):
 
 @app.route('/traffic')
 def nn_traffic_f(chat_id=None):
-    resp = '''I don't know :('''
     res = nn_traffic.current_traffic()
-    if res:
-        resp = '''<b>Nizhniy Novgorod</b>: traffic jams level is <b>%s</b> pt%s''' % (res[0], '' if res[0] == 1 else 's')
-        if res[1]:
-            resp += ' — ' + res[1]
+    if res is None:
+        res = ('', 'No traffic data :(')
+        # resp = '<b>Nizhniy Novgorod</b>: traffic jams level is <b>%s</b> pt%s' % (res[0], '' if res[0] == 1 else 's')
+        # if res[1]:
+        #    resp += ' — ' + res[1]
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
-    return '<pre>%s</pre>' % resp
+        ret = send_reply({'method': 'sendPhoto',
+                          'chat_id': chat_id,
+                          'caption': 'Nizhniy Novgorod: %s' % res[1],
+                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic-ico/traffic%s.png' % res[0]})
+        return ret
+        # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp
 
 
 @app.route('/whoami')
