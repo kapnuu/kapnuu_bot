@@ -33,6 +33,7 @@ def favicon():
 def weather_ico(ico):
     return send_from_directory(path.join(app.root_path, 'static/weather-ico'), ico)
 
+
 @app.route('/traffic/ico/<ico>')
 def traffic_ico(ico):
     return send_from_directory(path.join(app.root_path, 'static/traffic-ico'), ico)
