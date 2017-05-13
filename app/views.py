@@ -12,6 +12,9 @@ log = logging.getLogger('app')
 #TODO use user timezone
 tz_offset = 3 * 60 * 60 - int(app.config.get('BOT_TZ_OFFSET'))
 
+BEER_MUG = (b'\xF0\x9F\x8D\xBA').decode('utf-8')
+CLINKING_BEER_MUGS = (b'\xF0\x9F\x8D\xBB').decode('utf-8')
+
 
 def dt(u): return datetime.datetime.fromtimestamp(u)
 
@@ -97,7 +100,7 @@ def process_request():
                     return now_f(chat_id)
                 elif text == '/whoareallthesefpeople':
                     return whoareallthesefpeople_f(chat_id)
-                elif text == u'\UF09F8DBA' or  text == u'\UF09F8DBB':
+                elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
                     return beer_f(chat_id, message['from'])
                 elif text == '/test':
                     return test_img_f(chat_id)
@@ -393,7 +396,7 @@ def beer_f(chat_id, who=None):
         elif who.get('first_name'):
             greet = who.get('first_name')
 
-    resp = '%s, %s' % (greet, u'\UF09F8DBB')
+    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
