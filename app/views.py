@@ -389,12 +389,8 @@ def whoareallthesefpeople_f(chat_id=None):
 
 def beer_f(chat_id, who=None):
     greet = 'Human'
-    if who:
-        user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
-        if user:
-            greet = user.greet if user.greet else user.name
-        elif who.get('first_name'):
-            greet = who.get('first_name')
+    if who.get('first_name'):
+        greet = who.get('first_name')
 
     resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
