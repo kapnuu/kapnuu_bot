@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db, nn_traffic
+from app import app, openweathermap, cbr, models, db, nn_traffic, huificator
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -79,15 +79,15 @@ def process_request():
                     return whoami_f(chat_id, message['from'])
                 elif text == '/huify':
                     return huify_f(chat_id, True, message['from'])
-                elif text.startswith('/huify'):
-                    return send_reply({'chat_id': chat_id, 'text': 'Катя Олеговна, хуификатор пока не работает'})
+                elif text.startswith('/huify '):
+                    return huify_text_f(chat_id, text[7:])
                 elif text == '/unhuify':
                     return huify_f(chat_id, False, message['from'])
                 elif text == '/weather':
                     return weather_f(chat_id)
                 elif text == '/traffic':
                     return nn_traffic_f(chat_id)
-                elif text.startswith('/currency'):
+                elif text.startswith('/currency '):
                     iso = text[10:]
                     if not iso:
                         iso = 'usd'
@@ -393,6 +393,11 @@ def beer_f(chat_id, who=None):
         greet = who.get('first_name')
 
     resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
+    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+
+
+def huify_text_f(chat_id, text, who=None):
+    resp = huificator.huify(text)
     return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
