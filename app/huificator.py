@@ -18,7 +18,7 @@ huexp = re.compile('^[бвгджзйклмнпрстфхцчшщъь]*([аеёи
 huexceptions = {
     'хуификатор': 'Hmm?',
     'путин': 'Mr. President',
-    'россия': 'https://en.wikipedia.org/wiki/Russia',
+    'россия': '<a href="https://en.wikipedia.org/wiki/Russia">Russia</a>',
 }
 
 
