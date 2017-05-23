@@ -37,6 +37,9 @@ class DevelopConfig(Config):
     DEVELOPMENT = True
     BOT_TZ_OFFSET = 3 * 60 * 60
 
-    with open('token.txt') as f:
-        BOT_TOKEN = f.readline().strip()
-        REQUEST_TOKEN = f.readline().strip()
+    try:
+        with open('token.txt') as f:
+            BOT_TOKEN = f.readline().strip()
+            REQUEST_TOKEN = f.readline().strip()
+    except:
+        pass
