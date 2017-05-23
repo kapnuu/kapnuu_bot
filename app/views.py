@@ -42,14 +42,51 @@ def traffic_ico(ico):
     return send_from_directory(path.join(app.root_path, 'static/traffic-ico'), ico)
 
 
-def send_reply(resp):
+def process_reply(resp):
     if 'method' not in resp:
         resp['method'] = 'sendMessage'
-    return app.response_class(
-        response=json.dumps(resp),
-        status=200,
-        mimetype='application/json'
-    )
+    return resp
+
+
+def process_message(message):
+    chat_id = message['chat']['id']
+
+    text = message['text'].lower()
+    if text.startswith('/start') or text == '/help':
+        result = start_f(chat_id, message['from'])
+    elif text == '/whoami':
+        result = whoami_f(chat_id, message['from'])
+    elif text == '/huify':
+        result = huify_f(chat_id, True, message['from'])
+    elif text.startswith('/huify '):
+        result = huify_text_f(chat_id, text[7:])
+    elif text == '/unhuify':
+        result = huify_f(chat_id, False, message['from'])
+    elif text == '/weather':
+        result = weather_f(chat_id)
+    elif text == '/traffic':
+        result = nn_traffic_f(chat_id)
+    elif text.startswith('/currency '):
+        iso = text[10:]
+        if not iso:
+            iso = 'usd'
+        result = currency_f(iso, chat_id)
+    elif text == 'замучить котов' \
+            or text == 'мучить котов' \
+            or text == 'torture cats':
+        result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
+    elif text == '/now' or text == 'what time is it?':
+        result = now_f(chat_id)
+    elif text == '/whoareallthesefpeople':
+        result = whoareallthesefpeople_f(chat_id)
+    elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
+        result = beer_f(chat_id, message['from'])
+    elif text == '/test':
+        result = test_img_f(chat_id)
+    else:
+        result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
+
+    return result
 
 
 @app.route('/hook', methods=['GET', 'POST'])
@@ -71,42 +108,11 @@ def process_request():
                 message = data['edited_message']
 
             if message:
-                chat_id = message['chat']['id']
-
-                text = message['text'].lower()
-                if text.startswith('/start') or text == '/help':
-                    return start_f(chat_id, message['from'])
-                elif text == '/whoami':
-                    return whoami_f(chat_id, message['from'])
-                elif text == '/huify':
-                    return huify_f(chat_id, True, message['from'])
-                elif text.startswith('/huify '):
-                    return huify_text_f(chat_id, text[7:])
-                elif text == '/unhuify':
-                    return huify_f(chat_id, False, message['from'])
-                elif text == '/weather':
-                    return weather_f(chat_id)
-                elif text == '/traffic':
-                    return nn_traffic_f(chat_id)
-                elif text.startswith('/currency '):
-                    iso = text[10:]
-                    if not iso:
-                        iso = 'usd'
-                    return currency_f(iso, chat_id)
-                elif text == 'замучить котов'\
-                        or text == 'мучить котов'\
-                        or text == 'torture cats':
-                    return send_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
-                elif text == '/now' or text == 'what time is it?':
-                    return now_f(chat_id)
-                elif text == '/whoareallthesefpeople':
-                    return whoareallthesefpeople_f(chat_id)
-                elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
-                    return beer_f(chat_id, message['from'])
-                elif text == '/test':
-                    return test_img_f(chat_id)
-                else:
-                    return send_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
+                return app.response_class(
+                    response=json.dumps(process_message(message)),
+                    status=200,
+                    mimetype='application/json'
+                )
             else:
                 log.error('No `message` in request.json: %s' % request.data)
         else:
@@ -168,7 +174,7 @@ Thanks, <i>kapnuu bot</i>
 <b>P. S.</b> And do not try to <b>torture cats</b>. Never. NEVER!''' % hi
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
 
 
@@ -234,7 +240,7 @@ def weather_f(chat_id=None):
             #            'photo': ico})
             res = '''<b>%s</b>: <a href="%sweather?%s">%s, %s</a>
 %s''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
-            ret = send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
+            ret = process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
             log.info(ret)
             return ret
 
@@ -258,7 +264,7 @@ def currency_f(iso, chat_id=None):
             resp = "I don't know <i>%s</i>" % iso
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<h1>%s</h1>' % resp
 
 
@@ -267,7 +273,7 @@ def now_f(chat_id=None):
     resp = '%s UTC' % datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'text': resp})
+        return process_reply({'chat_id': chat_id, 'text': resp})
     return '<h1>%s</h1>' % resp
 
 
@@ -280,11 +286,10 @@ def nn_traffic_f(chat_id=None):
         # if res[1]:
         #    resp += ' — ' + res[1]
     if chat_id:
-        ret = send_reply({'method': 'sendPhoto',
+        ret = process_reply({'method': 'sendPhoto',
                           'chat_id': chat_id,
                           'caption': 'Nizhniy Novgorod: %s' % res[1],
-                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png?%s' %
-                                   (res[0], random.uniform(0.0, 1.0))})
+                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]})
         return ret
         # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp
@@ -349,7 +354,7 @@ Use /mynameis to change your personal greeting.''' % greet
 Use /mynameis if you want a personal greeting.'''
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
 
 
@@ -369,7 +374,7 @@ def huify_f(chat_id, huify, who):
 
     db.session.add(user)
     db.session.commit()
-    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
 @app.route('/whoareallthesefpeople')
@@ -384,7 +389,7 @@ def whoareallthesefpeople_f(chat_id=None):
         resp = 'No one is here'
 
     if chat_id:
-        return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return '<pre>%s</pre>' % resp
 
 
@@ -394,16 +399,16 @@ def beer_f(chat_id, who=None):
         greet = who.get('first_name')
 
     resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
-    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
 def huify_text_f(chat_id, text, who=None):
     resp = huificator.huify(text)
-    return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
 def test_img_f(chat_id):
-    ret = send_reply({'method': 'sendPhoto',
+    ret = process_reply({'method': 'sendPhoto',
                       'chat_id': chat_id,
                       'caption': 'Test',
                       'photo': 'https://kapnuu-bot.herokuapp.com/weather-ico/03n.png'})

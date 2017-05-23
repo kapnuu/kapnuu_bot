@@ -35,5 +35,8 @@ class ProductionConfig(Config):
 class DevelopConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
-    REQUEST_TOKEN = '2128506'
     BOT_TZ_OFFSET = 3 * 60 * 60
+
+    with open('token.txt') as f:
+        BOT_TOKEN = f.readline().strip()
+        REQUEST_TOKEN = f.readline().strip()
