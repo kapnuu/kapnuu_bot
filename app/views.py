@@ -62,7 +62,7 @@ def process_request():
     try:
         data = request.json  # json.loads(request.data)
         log.info(data)
-        log.info(request.headers)
+        #  log.info(request.headers)
         if data:
             message = None
             if 'message' in data:
@@ -146,7 +146,6 @@ def start_f(chat_id=None, who=None):
     responses = ['Hello, %s!',
                  'Hi there, %s.',
                  'Дратути, %s!',
-                 'Превед %s!!1111адинaдин',
                  'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
@@ -162,6 +161,7 @@ You can get info by sending these commands:
 /currency — get currency (use /currency/<i>ISO</i>) to RUR rate
 /now — get current date and time in UTC
 /whoami — get your personal settings
+/traffic — traffic jams in Nizhniy Novgorod
 
 Thanks, <i>kapnuu bot</i>
 
