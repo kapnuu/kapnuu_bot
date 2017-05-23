@@ -7,6 +7,7 @@ app = Flask(__name__)
 settings = os.environ.get('APP_SETTINGS')
 if settings is None:
     settings = 'DevelopConfig'
+app.logger.info('Loading %s' % settings)
 app.config.from_object('config.' + settings)
 
 db = SQLAlchemy(app)
