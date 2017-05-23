@@ -62,7 +62,7 @@ def process_request():
     try:
         data = request.json  # json.loads(request.data)
         log.info(data)
-        log.info(request.remote_addr)
+        log.info(request.headers)
         if data:
             message = None
             if 'message' in data:
