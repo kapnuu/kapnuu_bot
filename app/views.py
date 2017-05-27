@@ -286,10 +286,13 @@ def nn_traffic_f(chat_id=None):
         # if res[1]:
         #    resp += ' — ' + res[1]
     if chat_id:
+        photo = 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]
+        if res[0] == 2:
+            photo = '%s?1' % photo
         ret = process_reply({'method': 'sendPhoto',
                           'chat_id': chat_id,
                           'caption': 'Nizhniy Novgorod: %s' % res[1],
-                          'photo': 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]})
+                          'photo': photo})
         return ret
         # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
     return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp
