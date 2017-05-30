@@ -489,6 +489,7 @@ commands = {
     '/currency': currency_f,
     '/test': test_img_f,
     '/whoareallthesefpeople': whoareallthesefpeople_f,
+    '/whoarethesefpeople': whoareallthesefpeople_f,
     '/huify': huify_unhuify_f,
     '/unhuify': huify_unhuify_f,
     '/mynameis': mynameis_f,
