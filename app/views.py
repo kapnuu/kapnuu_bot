@@ -63,6 +63,7 @@ def process_request():
             elif 'callback_query' in message:
                 message = data['callback_query']['message']
                 message['text'] = message['callback_query']['data']
+                log.info(message)
 
             if message:
                 return app.response_class(
