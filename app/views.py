@@ -48,52 +48,6 @@ def process_reply(resp):
     return resp
 
 
-def process_message(message):
-    chat_id = message['chat']['id']
-
-    text = message['text'].lower()
-    if text.startswith('/start') or text == '/help':
-        result = start_f(chat_id, message['from'])
-    elif text == '/whoami':
-        result = whoami_f(chat_id, message['from'])
-    elif text == '/huify':
-        result = huify_f(chat_id, True, message['from'])
-    elif text.startswith('/huify '):
-        result = huify_text_f(chat_id, text[7:])
-    elif text == '/unhuify':
-        result = huify_f(chat_id, False, message['from'])
-    elif text == '/weather':
-        result = weather_f(chat_id)
-    elif text == '/traffic':
-        result = nn_traffic_f(chat_id)
-    elif text.startswith('/currency '):
-        iso = text[10:]
-        if not iso:
-            iso = 'usd'
-        result = currency_f(iso, chat_id)
-    elif text == 'замучить котов' \
-            or text == 'мучить котов' \
-            or text == 'torture cats':
-        result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
-    elif text == '/now' or text == 'what time is it?':
-        result = now_f(chat_id)
-    elif text == '/whoareallthesefpeople':
-        result = whoareallthesefpeople_f(chat_id)
-    elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
-        result = beer_f(chat_id, message['from'])
-    elif text == '/test':
-        result = test_img_f(chat_id)
-    else:
-        result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
-
-    return result
-
-
-@app.route('/hook', methods=['GET', 'POST'])
-def process_request2():
-    return process_request()
-
-
 @app.route('/%s/hook' % config.Config.REQUEST_TOKEN, methods=['GET', 'POST'])
 def process_request():
     try:
@@ -123,16 +77,16 @@ def process_request():
 
 
 @app.route('/start')
-def start_f(chat_id=None, who=None):
+def start_f(chat_id=None, who=None, args=None, cmd=None):
 
-    first_name = None
+    greet = None
     if who is not None:
         t_id = who.get('id')
         first_name = who.get('first_name')
         username = who.get('username')
         last_name = who.get('last_name')
 
-        name = first_name
+        greet = name = first_name
         if username:
             name = '%s %s' % (name, username)
         if last_name:
@@ -149,22 +103,23 @@ def start_f(chat_id=None, who=None):
             user.name = name
             db.session.commit()
 
+        if user.greet:
+            greet = user.greet
+
     responses = ['Hello, %s!',
                  'Hi there, %s.',
                  'Дратути, %s!',
                  'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
-    hi = random.choice(responses) % (first_name if first_name else 'Human')
+    hi = random.choice(responses) % (greet if greet else 'Human')
 
     resp = '''%s
-Sorry, I am not very useful bot, I'm just a my creator's helper: now he is learning how to develop telegram bots.
-
 You can get info by sending these commands:
 
 /help — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
-/currency — get currency (use /currency/<i>ISO</i>) to RUR rate
+/currency — get currency (use /currency <i>ISO</i>) to RUR rate
 /now — get current date and time in UTC
 /whoami — get your personal settings
 /traffic — traffic jams in Nizhniy Novgorod
@@ -179,7 +134,7 @@ Thanks, <i>kapnuu bot</i>
 
 
 @app.route('/weather', methods=['GET'])
-def weather_f(chat_id=None):
+def weather_f(chat_id=None, who=None, args=None, cmd=None):
     weather = openweathermap.current_weather()
     if weather:
         log.info(weather)
@@ -251,25 +206,70 @@ def weather_f(chat_id=None):
         abort(500)
 
 
-@app.route('/currency/<iso>', methods=['GET'])
-def currency_f(iso, chat_id=None):
-    iso = iso.lower()
-    if iso == 'rur':
-        resp = '1 RUR is 1 RUR, dude!'
+currencies = [
+    ('rur', b'\xf0\x9f\x87\xb7\xf0\x9f\x87\xba', b'\xe2\x82\xbd'),
+    ('usd', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xb8', b'\x00\x24'),
+    ('eur', b'\xf0\x9f\x87\xaa\xf0\x9f\x87\xba', b'\xe2\x82\xac'),
+    ('chf', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xad', b'\xe2\x82\xa3'),
+    ('gbp', b'\xf0\x9f\x87\xac\xf0\x9f\x87\xa7', b'\xc2\xa3'),
+    ('jpy', b'\xf0\x9f\x87\xaf\xf0\x9f\x87\xb5', b'\xc2\xa5'),
+    ('uah', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xa6', b'\xe2\x82\xb4'),
+    ('kzt', b'\xf0\x9f\x87\xb0\xf0\x9f\x87\xbf', b'\xe2\x82\xb8'),
+    ('byn', b'\xf0\x9f\x87\xa7\xf0\x9f\x87\xbe', b'Br'),
+    ('try', b'\xf0\x9f\x87\xb9\xf0\x9f\x87\xb7', b'\xe2\x82\xba'),
+    ('cny', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xb3', b'\xe5\x85\x83'),
+    ('aud', b'\xf0\x9f\x87\xa6\xf0\x9f\x87\xba', b'\x00\x24'),
+    ('cad', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xa6', b'\x00\x24'),
+    ('pln', b'\xf0\x9f\x87\xb5\xf0\x9f\x87\xb1', b'Z\xc5\x82'),
+    ('inr', b'\xf0\x9f\x87\xae\xf0\x9f\x87\xb3', b'\xe2\x82\xb9'),
+]
+
+
+@app.route('/currency/<args>', methods=['GET'])
+def currency_f(chat_id=None, who=None, args=None, cmd=None):
+    keyboard = None
+    iso = args
+    if not iso:
+        buttons = []
+        for cur in currencies:
+            if cur[0] != 'rub':
+                buttons.append(
+                    {'text': '%s %s' % (cur[1].decode('utf-8'), cur[0].upper()),
+                     'callback_data': '/currency %s' % cur[0]})
+
+        blen3 = len(buttons) // 4
+        keyboard = {'inline_keyboard': [
+            buttons[:blen3],
+            buttons[blen3:2 * blen3],
+            buttons[2 * blen3:3 * blen3],
+            buttons[3 * blen3:],
+        ]}
+
+        resp = 'Select currency:'
     else:
-        rate = cbr.currency_rate(iso)
-        if rate:
-            resp = '1 %s = %s RUR' % (iso.upper(), rate)
+        iso = iso.lower()
+        if iso == 'rur':
+            resp = '1 RUR is 1 RUR, dude!'
         else:
-            resp = "I don't know <i>%s</i>" % iso
+            rate = cbr.currency_rate(iso)
+            if rate:
+                sym = currencies[iso][2].decode('utf-8') if (iso in currencies) else iso
+                rur = b'\xe2\x82\xbd'.decode('utf-8')
+                resp = '1 %s = %s %s' % (sym, rate, rur)
+            else:
+                resp = "I don't know <i>%s</i>" % iso
 
     if chat_id:
-        return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+        response = {'chat_id': chat_id, 'parse_mode': 'html', 'text': resp}
+        if keyboard:
+            response['reply_markup'] = json.dumps(keyboard)
+
+        return process_reply(response)
     return '<h1>%s</h1>' % resp
 
 
 @app.route('/now')
-def now_f(chat_id=None):
+def now_f(chat_id=None, who=None, args=None, cmd=None):
     resp = '%s UTC' % datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
 
     if chat_id:
@@ -278,13 +278,10 @@ def now_f(chat_id=None):
 
 
 @app.route('/traffic')
-def nn_traffic_f(chat_id=None):
+def nn_traffic_f(chat_id=None, who=None, args=None, cmd=None):
     res = nn_traffic.current_traffic()
     if res is None:
         res = ('', 'No traffic data :(')
-        # resp = '<b>Nizhniy Novgorod</b>: traffic jams level is <b>%s</b> pt%s' % (res[0], '' if res[0] == 1 else 's')
-        # if res[1]:
-        #    resp += ' — ' + res[1]
     if chat_id:
         photo = 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]
         if res[0] == 2:
@@ -299,7 +296,7 @@ def nn_traffic_f(chat_id=None):
 
 
 @app.route('/whoami')
-def whoami_f(chat_id=None, who=None):
+def whoami_f(chat_id=None, who=None, args=None, cmd=None):
 
     if who is not None:
         t_id = who.get('id')
@@ -361,7 +358,8 @@ Use /mynameis if you want a personal greeting.'''
     return '<pre>%s</pre>' % resp
 
 
-def huify_f(chat_id, huify, who):
+def huify_f(chat_id, who, huify):
+
     changed = True
     user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
     if user:
@@ -370,18 +368,32 @@ def huify_f(chat_id, huify, who):
     else:
         user = models.BotUser(telegram_id=who.get('id'), huify=huify)
 
-    if changed:
-        resp = 'OK, %s, your messages will be %shuified now.' % (who.get('first_name'), '' if huify else 'un')
+    greet = user.greet if user.greet else who.get('first_name')
+
+    if huify:
+        if changed:
+            resp = 'OK, %s, your messages will be huified now.' % greet
+        else:
+            resp = 'OK, %s, your messages are already being huified.' % greet
     else:
-        resp = 'OK, %s, your messages are already %shuified.' % (who.get('first_name'), '' if huify else 'un')
+        if changed:
+            resp = 'OK, %s, your messages will not be huified now.' % greet
+        else:
+            resp = 'OK, %s, your messages are already not being huified.' % greet
 
     db.session.add(user)
     db.session.commit()
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
+def huify_unhuify_f(chat_id=None, who=None, args=None, cmd=None):
+    if cmd == '/huify':
+        return huify_f(chat_id, who, True)
+    return huify_f(chat_id, who, False)
+
+
 @app.route('/whoareallthesefpeople')
-def whoareallthesefpeople_f(chat_id=None):
+def whoareallthesefpeople_f(chat_id=None, who=None, args=None, cmd=None):
     users = models.BotUser.query.all()
     if users and len(users):
         resp = 'Here they are:'
@@ -396,7 +408,7 @@ def whoareallthesefpeople_f(chat_id=None):
     return '<pre>%s</pre>' % resp
 
 
-def beer_f(chat_id, who=None):
+def beer_f(chat_id, who=None, args=None, cmd=None):
     greet = 'Human'
     if who.get('first_name'):
         greet = who.get('first_name')
@@ -410,10 +422,118 @@ def huify_text_f(chat_id, text, who=None):
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
-def test_img_f(chat_id):
-    ret = process_reply({'method': 'sendPhoto',
-                      'chat_id': chat_id,
-                      'caption': 'Test',
-                      'photo': 'https://kapnuu-bot.herokuapp.com/weather-ico/03n.png'})
-    # log.info(ret)
+def mynameis_f(chat_id, who, name, cmd):
+    permaname = False
+
+    user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
+    if user:
+        if user.telegram_id == 396010103:  # or user.telegram_id == 314473825:
+            permaname = True
+    else:
+        user = models.BotUser(telegram_id=who.get('id'))
+
+    current = user.greet if user.greet else who['first_name']
+
+    if name:
+        if permaname:
+            resp = '%s, %s' % (current, huificator.huify(name))
+        else:
+            user.greet = name
+            resp = 'OK, %s' % name
+
+    else:
+        resp = '%s, use /mynameis <i>greeting</i>' % current
+
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+
+
+def test_img_f(chat_id, who=None, args=None, cmd=None):
+    keyboard = {'inline_keyboard': [
+        [{'text': '1', 'callback_data': '/weather'},
+         {'text': '2', 'callback_data': '/traffic'}]
+    ]}
+    ret = process_reply({'chat_id': chat_id, 'text': 'test',
+                         'reply_markup': json.dumps(keyboard)})
+    log.info(ret)
     return ret
+
+
+commands = {
+    '/help': start_f,
+    '/start': start_f,
+    '/whoami': whoami_f,
+    '/weather': weather_f,
+    '/traffic': nn_traffic_f,
+    '/now': now_f,
+    '/currency': currency_f,
+    '/test': test_img_f,
+    '/whoareallthesefpeople': whoareallthesefpeople_f,
+    '/huify': huify_unhuify_f,
+    '/unhuify': huify_unhuify_f,
+    '/mynameis': mynameis_f,
+}
+
+
+def process_message(message):
+    chat_id = message['chat']['id']
+
+    req = message['text'].split(maxsplit=1)
+    if len(req) > 1:
+        (command, args) = req
+    else:
+        command = req[0]
+        args = None
+
+    if command.endswith('@kapnuu_bot'):
+        command = command[:-11]
+
+    if command.startswith('/'):
+        command = command.lower()
+
+    if command in commands:
+        result = commands[command](chat_id, message['from'], args, command)
+        if result:
+            return result
+
+    text = message['text'].lower()
+    # if text.startswith('/start') or text == '/help':
+    #    result = start_f(chat_id, message['from'])
+    # elif text == '/whoami':
+    #    result = whoami_f(chat_id, message['from'])
+    # if text == '/huify':
+    #    result = huify_f(chat_id, True, message['from'])
+    # elif text.startswith('/huify '):
+    #    result = huify_text_f(chat_id, text[7:])
+    # elif text == '/unhuify':
+    #    result = huify_f(chat_id, False, message['from'])
+    # elif text == '/weather':
+    #    result = weather_f(chat_id)
+    # elif text == '/traffic':
+    #    result = nn_traffic_f(chat_id)
+    #elif text.startswith('/currency'):
+    #    iso = text[10:]
+    #    result = currency_f(iso, chat_id)
+    if text == 'замучить котов' \
+            or text == 'мучить котов' \
+            or text == 'torture cats':
+        result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
+    # elif text == '/now' or text == 'what time is it?':
+    #    result = now_f(chat_id)
+    # elif text == '/whoareallthesefpeople':
+    #    result = whoareallthesefpeople_f(chat_id)
+    elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
+        result = beer_f(chat_id, message['from'])
+    # elif text.startswith('/mynameis'):
+    #    name = message['text'][10:].strip()
+    #    result = mynameis_f(chat_id, name, message['from'])
+    # elif text == '/test':
+    #    result = test_img_f(chat_id)
+    else:
+        result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
+
+    return result
+
+
+@app.route('/hook', methods=['GET', 'POST'])
+def process_request2():
+    return process_request()

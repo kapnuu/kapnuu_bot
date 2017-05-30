@@ -31,10 +31,12 @@ try:
     last_update_id = models.Data.query.filter_by(key='last_update_id').first()
     if last_update_id is None:
         last_update_id = models.Data(key='last_update_id', value=0)
+    last_update_id_val = int(last_update_id.value)
 
+    first_run = True
     tmo = MIN_TMO
     while True:
-        res = requests.get(URL + 'getUpdates')
+        res = requests.get('%sgetUpdates?offset=%s' % (URL, last_update_id_val))
         if res.ok:
             json = res.json()
             if not json['ok'] or not json['result']:
@@ -44,15 +46,25 @@ try:
                 for message in updates:
                     if 'update_id' in message:
                         update_id = message['update_id']
-                        if update_id > int(last_update_id.value):
-                            if message and 'message' in message:
-                                response = process_message(message['message'])
-                                requests.request('post', URL + response['method'], data=response)
+                        if update_id > last_update_id_val:
+                            last_update_id_val = update_id
 
-                                last_update_id.value = str(update_id)
-                                last_update_id.last_updated = datetime.datetime.now()
-                                db.session.add(last_update_id)
-                                db.session.commit()
+                            if message and 'message' in message:
+                                if not first_run:
+                                    response = process_message(message['message'])
+                                    r = requests.request('post', '%s%s' % (URL, response['method']), data=response)
+
+                            if message and 'callback_query' in message:
+                                message['callback_query']['message']['text'] = message['callback_query']['data']
+                                response = process_message(message['callback_query']['message'])
+                                requests.request('post', '%s%s' % (URL, response['method']), data=response)
+
+                            last_update_id.value = str(last_update_id_val)
+                            last_update_id.last_updated = datetime.datetime.now()
+                            db.session.add(last_update_id)
+                            db.session.commit()
+
+                first_run = False
                 tmo = MIN_TMO
 
         if tmo > MAX_TMO:
