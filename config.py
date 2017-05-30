@@ -41,5 +41,6 @@ class DevelopConfig(Config):
         with open('token.txt') as f:
             BOT_TOKEN = f.readline().strip()
             REQUEST_TOKEN = f.readline().strip()
+            HEROKU_APP_NAME = f.readline().strip()
     except:
         pass

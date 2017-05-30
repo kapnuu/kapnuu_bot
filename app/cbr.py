@@ -45,7 +45,7 @@ def currency_rate(iso):
         log.error('Failed to download data: %s' % e)
 
     if cur and len(cur) == 1:
-        rate = cur[0].value.text
+        rate = (int(cur[0].nominal.text), float(cur[0].value.text.replace(',', '.')))
         log.info('currency_rate(%s) = %s' % (iso, rate))
         return rate
     else:

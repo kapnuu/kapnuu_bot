@@ -9,11 +9,11 @@ from os import path
 
 log = logging.getLogger('app')
 
-#TODO use user timezone
+# TODO use user timezone
 tz_offset = 3 * 60 * 60 - int(app.config.get('BOT_TZ_OFFSET'))
 
-BEER_MUG = (b'\xF0\x9F\x8D\xBA').decode('utf-8')
-CLINKING_BEER_MUGS = (b'\xF0\x9F\x8D\xBB').decode('utf-8')
+BEER_MUG = b'\xF0\x9F\x8D\xBA'.decode('utf-8')
+CLINKING_BEER_MUGS = b'\xF0\x9F\x8D\xBB'.decode('utf-8')
 
 
 def dt(u): return datetime.datetime.fromtimestamp(u)
@@ -78,7 +78,6 @@ def process_request():
 
 @app.route('/start')
 def start_f(chat_id=None, who=None, args=None, cmd=None):
-
     greet = None
     if who is not None:
         t_id = who.get('id')
@@ -139,8 +138,8 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
     if weather:
         log.info(weather)
 
-        if config.Config.HEROKU_APP_NAME:
-            base_url = 'https://%s.herokuapp.com/' % config.Config.HEROKU_APP_NAME
+        if app.config.get('HEROKU_APP_NAME'):
+            base_url = 'https://%s.herokuapp.com/' % app.config.get('HEROKU_APP_NAME')
         else:
             base_url = '/'
 
@@ -184,7 +183,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
         minutes = int((day_d - seconds) / 60 + seconds / 60) % 60
         hours = (day_d - minutes * 60) // 60 // 60
 
-        details = '%s %s&nbsp;mph. Clouds %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' %\
+        details = '%s %s&nbsp;mph. Clouds %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' % \
                   (wind, weather['wind']['speed'], weather['clouds']['all'], hours, str(minutes).zfill(2),
                    dt(sunrise).strftime('%H:%M'), dt(sunset).strftime('%H:%M'))
 
@@ -195,7 +194,8 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
             #            'photo': ico})
             res = '''<b>%s</b>: <a href="%sweather?%s">%s, %s</a>
 %s''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
-            ret = process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
+            ret = process_reply(
+                {'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
             log.info(ret)
             return ret
 
@@ -232,7 +232,7 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
     if not iso:
         buttons = []
         for cur in currencies:
-            if cur[0] != 'rub':
+            if cur[0] != 'rur':
                 buttons.append(
                     {'text': '%s %s' % (cur[1].decode('utf-8'), cur[0].upper()),
                      'callback_data': '/currency %s' % cur[0]})
@@ -247,17 +247,28 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
 
         resp = 'Select currency:'
     else:
+        resp = fmt = flag = sym = rate = None
+
+        rur = currencies[0]
+        rur_sym = rur[2].decode('utf-8')
+
         iso = iso.lower()
         if iso == 'rur':
-            resp = '1 RUR is 1 RUR, dude!'
+            flag = rur[1].decode('utf-8')
+            sym = rur[2].decode('utf-8')
+            fmt = '%s 1 %s is 1 %s %s, dude!'
         else:
             rate = cbr.currency_rate(iso)
             if rate:
-                sym = currencies[iso][2].decode('utf-8') if (iso in currencies) else iso
-                rur = b'\xe2\x82\xbd'.decode('utf-8')
-                resp = '1 %s = %s %s' % (sym, rate, rur)
+                cur = next((x for x in currencies if x[0] == iso), None)
+                flag = '%s ' % cur[1].decode('utf-8') if cur else ''
+                sym = cur[2].decode('utf-8') if cur else iso.upper()
+                fmt = '%s %s %s = %.2f %s ' + rur[1].decode('utf-8')
             else:
-                resp = "I don't know <i>%s</i>" % iso
+                resp = 'I don\'t know <i>%s</i>' % iso.upper()
+
+        if not resp:
+            resp = fmt % (flag, rate[0], sym, rate[1], rur_sym)
 
     if chat_id:
         response = {'chat_id': chat_id, 'parse_mode': 'html', 'text': resp}
@@ -283,21 +294,25 @@ def nn_traffic_f(chat_id=None, who=None, args=None, cmd=None):
     if res is None:
         res = ('', 'No traffic data :(')
     if chat_id:
-        photo = 'https://kapnuu-bot.herokuapp.com/traffic/ico/traffic%s.png' % res[0]
+        if app.config.get('HEROKU_APP_NAME'):
+            base_url = 'https://%s.herokuapp.com/' % app.config.get('HEROKU_APP_NAME')
+        else:
+            base_url = '/'
+
+        photo = '%straffic/ico/traffic%s.png' % (base_url, res[0])
         if res[0] == 2:
             photo = '%s?1' % photo
         ret = process_reply({'method': 'sendPhoto',
-                          'chat_id': chat_id,
-                          'caption': 'Nizhniy Novgorod: %s' % res[1],
-                          'photo': photo})
+                             'chat_id': chat_id,
+                             'caption': 'Nizhniy Novgorod: %s' % res[1],
+                             'photo': photo})
         return ret
-        # return send_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+
     return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp
 
 
 @app.route('/whoami')
 def whoami_f(chat_id=None, who=None, args=None, cmd=None):
-
     if who is not None:
         t_id = who.get('id')
         first_name = who.get('first_name')
@@ -334,7 +349,7 @@ def whoami_f(chat_id=None, who=None, args=None, cmd=None):
 
     resp = '''Hello, %s!
     
-This feature in development now.''' % who_name
+This feature is in development now.''' % who_name
     if huify:
         resp += '''
 
@@ -359,7 +374,6 @@ Use /mynameis if you want a personal greeting.'''
 
 
 def huify_f(chat_id, who, huify):
-
     changed = True
     user = models.BotUser.query.filter_by(telegram_id=who.get('id')).first()
     if user:
@@ -452,9 +466,10 @@ def test_img_f(chat_id, who=None, args=None, cmd=None):
         [{'text': '1', 'callback_data': '/weather'},
          {'text': '2', 'callback_data': '/traffic'}]
     ]}
+
     ret = process_reply({'chat_id': chat_id, 'text': 'test',
                          'reply_markup': json.dumps(keyboard)})
-    log.info(ret)
+    # log.info(ret)
     return ret
 
 
@@ -496,38 +511,12 @@ def process_message(message):
             return result
 
     text = message['text'].lower()
-    # if text.startswith('/start') or text == '/help':
-    #    result = start_f(chat_id, message['from'])
-    # elif text == '/whoami':
-    #    result = whoami_f(chat_id, message['from'])
-    # if text == '/huify':
-    #    result = huify_f(chat_id, True, message['from'])
-    # elif text.startswith('/huify '):
-    #    result = huify_text_f(chat_id, text[7:])
-    # elif text == '/unhuify':
-    #    result = huify_f(chat_id, False, message['from'])
-    # elif text == '/weather':
-    #    result = weather_f(chat_id)
-    # elif text == '/traffic':
-    #    result = nn_traffic_f(chat_id)
-    #elif text.startswith('/currency'):
-    #    iso = text[10:]
-    #    result = currency_f(iso, chat_id)
     if text == 'замучить котов' \
             or text == 'мучить котов' \
             or text == 'torture cats':
         result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
-    # elif text == '/now' or text == 'what time is it?':
-    #    result = now_f(chat_id)
-    # elif text == '/whoareallthesefpeople':
-    #    result = whoareallthesefpeople_f(chat_id)
     elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
         result = beer_f(chat_id, message['from'])
-    # elif text.startswith('/mynameis'):
-    #    name = message['text'][10:].strip()
-    #    result = mynameis_f(chat_id, name, message['from'])
-    # elif text == '/test':
-    #    result = test_img_f(chat_id)
     else:
         result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
 
