@@ -405,6 +405,8 @@ def huify_f(chat_id, who, huify):
 
 def huify_unhuify_f(chat_id=None, who=None, args=None, cmd=None):
     if cmd == '/huify':
+        if args:
+            return huify_text_f(chat_id, args, who)
         return huify_f(chat_id, who, True)
     return huify_f(chat_id, who, False)
 
