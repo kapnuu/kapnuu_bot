@@ -61,8 +61,9 @@ def process_request():
             elif 'edited_message' in request.json:
                 message = data['edited_message']
             elif 'callback_query' in message:
+                text = message['callback_query']['data']
                 message = data['callback_query']['message']
-                message['text'] = message['callback_query']['data']
+                message['text'] = text
                 log.info(message)
 
             if message:
