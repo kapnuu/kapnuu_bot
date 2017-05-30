@@ -58,17 +58,12 @@ def process_request():
             message = None
             if 'message' in data:
                 message = data['message']
-            elif 'edited_message' in request.json:
+            elif 'edited_message' in data
                 message = data['edited_message']
-            elif 'callback_query' in message:
-                log.info('callback_query 1')
+            elif 'callback_query' in data:
                 text = message['callback_query']['data']
-                log.info('callback_query 2')
                 message = data['callback_query']['message']
-                log.info('callback_query 3')
                 message['text'] = text
-                log.info('callback_query 4')
-                log.info(message)
 
             if message:
                 return app.response_class(
