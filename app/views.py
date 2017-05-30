@@ -448,6 +448,7 @@ def mynameis_f(chat_id, who, name, cmd):
             permaname = True
     else:
         user = models.BotUser(telegram_id=who.get('id'))
+        db.session.add(user)
 
     current = user.greet if user.greet else who['first_name']
 
@@ -457,6 +458,8 @@ def mynameis_f(chat_id, who, name, cmd):
         else:
             user.greet = name
             resp = 'OK, %s' % name
+
+        db.session.commit()
 
     else:
         resp = '%s, use /mynameis <i>greeting</i>' % current
