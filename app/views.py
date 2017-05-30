@@ -61,7 +61,7 @@ def process_request():
             elif 'edited_message' in data:
                 message = data['edited_message']
             elif 'callback_query' in data:
-                text = message['callback_query']['data']
+                text = data['callback_query']['data']
                 message = data['callback_query']['message']
                 message['text'] = text
 
