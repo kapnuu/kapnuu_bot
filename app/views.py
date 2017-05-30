@@ -60,6 +60,9 @@ def process_request():
                 message = data['message']
             elif 'edited_message' in request.json:
                 message = data['edited_message']
+            elif 'callback_query' in message:
+                message = data['callback_query']['message']
+                message['text'] = message['callback_query']['data']
 
             if message:
                 return app.response_class(
