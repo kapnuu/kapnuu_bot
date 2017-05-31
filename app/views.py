@@ -258,8 +258,7 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
         iso = iso.lower()
         if iso == 'rur':
             flag = rur[1].decode('utf-8')
-            sym = rur[2].decode('utf-8')
-            fmt = '%s 1 %s is 1 %s %s, dude!'
+            resp = '%s 1 %s is 1 %s %s, dude!' % (flag, rur_sym, rur_sym, flag)
         else:
             rate = cbr.currency_rate(iso)
             if rate:
@@ -470,10 +469,18 @@ def mynameis_f(chat_id, who, name, cmd):
 
 
 def test_img_f(chat_id, who=None, args=None, cmd=None):
-    keyboard = {'inline_keyboard': [
-        [{'text': '1', 'callback_data': '/weather'},
-         {'text': '2', 'callback_data': '/traffic'}]
-    ]}
+    # keyboard = {'inline_keyboard': [
+    #    [{'text': '1', 'callback_data': '/weather'},
+    #     {'text': '2', 'callback_data': '/traffic'}]
+    # ]}
+    keyboard = {
+        'keyboard': [
+            [{'text': 'Share location', 'request_location': True},
+             {'text': 'Cancel'}]
+        ],
+        'resize_keyboard': True,
+        'one_time_keyboard': True,
+    }
 
     ret = process_reply({'chat_id': chat_id, 'text': 'test',
                          'reply_markup': json.dumps(keyboard)})
