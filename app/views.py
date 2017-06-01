@@ -213,6 +213,7 @@ currencies = [
     ('rur', b'\xf0\x9f\x87\xb7\xf0\x9f\x87\xba', b'\xe2\x82\xbd'),
     ('usd', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xb8', b'\x00\x24'),
     ('eur', b'\xf0\x9f\x87\xaa\xf0\x9f\x87\xba', b'\xe2\x82\xac'),
+    ('inr', b'\xf0\x9f\x87\xae\xf0\x9f\x87\xb3', b'\xe2\x82\xb9'),
     ('chf', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xad', b'\xe2\x82\xa3'),
     ('gbp', b'\xf0\x9f\x87\xac\xf0\x9f\x87\xa7', b'\xc2\xa3'),
     ('jpy', b'\xf0\x9f\x87\xaf\xf0\x9f\x87\xb5', b'\xc2\xa5'),
@@ -224,7 +225,7 @@ currencies = [
     ('aud', b'\xf0\x9f\x87\xa6\xf0\x9f\x87\xba', b'\x00\x24'),
     ('cad', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xa6', b'\x00\x24'),
     ('pln', b'\xf0\x9f\x87\xb5\xf0\x9f\x87\xb1', b'Z\xc5\x82'),
-    ('inr', b'\xf0\x9f\x87\xae\xf0\x9f\x87\xb3', b'\xe2\x82\xb9'),
+    ('czk', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xbf', b'K\xc4\x8d'),
 ]
 
 
@@ -240,12 +241,12 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
                     {'text': '%s %s' % (cur[1].decode('utf-8'), cur[0].upper()),
                      'callback_data': '/currency %s' % cur[0]})
 
-        blen3 = len(buttons) // 4
+        blen3 = len(buttons) / 4
         keyboard = {'inline_keyboard': [
-            buttons[:blen3],
-            buttons[blen3:2 * blen3],
-            buttons[2 * blen3:3 * blen3],
-            buttons[3 * blen3:],
+            buttons[:int(blen3)],
+            buttons[int(blen3):int(2 * blen3)],
+            buttons[int(2 * blen3):int(3 * blen3)],
+            buttons[int(3 * blen3):],
         ]}
 
         resp = 'Select currency:'
@@ -302,8 +303,8 @@ def nn_traffic_f(chat_id=None, who=None, args=None, cmd=None):
             base_url = '/'
 
         photo = '%straffic/ico/traffic%s.png' % (base_url, res[0])
-        if res[0] == 2:
-            photo = '%s?1' % photo
+        # if res[0] == 2:
+        #    photo = '%s?1' % photo
         ret = process_reply({'method': 'sendPhoto',
                              'chat_id': chat_id,
                              'caption': 'Nizhniy Novgorod: %s' % res[1],
