@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db, nn_traffic, huificator
+from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -186,8 +186,8 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
         minutes = int((day_d - seconds) / 60 + seconds / 60) % 60
         hours = (day_d - minutes * 60) // 60 // 60
 
-        details = '%s %s&nbsp;mph. Clouds %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' % \
-                  (wind, weather['wind']['speed'], weather['clouds']['all'], hours, str(minutes).zfill(2),
+        details = '%s %s&nbsp;mph. Humidity %s&nbsp;%%. Day duration is&nbsp;%s:%s: from&nbsp;%s to&nbsp;%s' % \
+                  (wind, weather['wind']['speed'], weather['main']['humidity'], hours, str(minutes).zfill(2),
                    dt(sunrise).strftime('%H:%M'), dt(sunset).strftime('%H:%M'))
 
         if chat_id:
@@ -437,7 +437,7 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
 
 
 def huify_text_f(chat_id, text, who=None):
-    resp = huificator.huify(text)
+    resp = huificator.huify(transcription.transcribe(text))
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
