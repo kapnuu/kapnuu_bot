@@ -561,6 +561,8 @@ def process_message(message):
             for m in add[:-1]:
                 requests.request('post', '%s%s' % (URL, m['method']), data=m)
             result = add[-1]
+    else:
+        print('no add in %s' % result)
 
     return result
 

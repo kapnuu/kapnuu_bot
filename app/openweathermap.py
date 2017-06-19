@@ -145,7 +145,6 @@ def get_forecast():
 
     ret = []
 
-    print(next1)
     response = requests.get(forecast_url)
     if response.status_code == 200:
         forecast = json.loads(response.text)
@@ -155,5 +154,4 @@ def get_forecast():
             if item:
                 icon = get_icon(item['weather'][0]['id'])
                 ret.append((n[1], int(item['main']['temp'] + 0.5), icon, item['weather'][0]['main']))
-                # print('%s %s %s°C' % (n[1], icon, int(item['main']['temp'] + 0.5)))
     return ret
