@@ -42,5 +42,7 @@ class DevelopConfig(Config):
             BOT_TOKEN = f.readline().strip()
             REQUEST_TOKEN = f.readline().strip()
             HEROKU_APP_NAME = f.readline().strip()
+            OWM_APIKEY = f.readline().strip()
+            OWM_CITYID = f.readline().strip()
     except:
         pass
