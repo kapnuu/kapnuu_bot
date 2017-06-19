@@ -149,6 +149,7 @@ def get_forecast():
     if response.status_code == 200:
         forecast = json.loads(response.text)
         for n in next1:
+            print(n)
             timestamp = calendar.timegm(n[0].utctimetuple()) - 3 * 60 * 60
             item = next((x for x in forecast['list'] if x['dt'] == timestamp), None)
             if item:
