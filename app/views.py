@@ -549,8 +549,9 @@ def process_message(message):
     else:
         result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
 
-    print(result)
+    print('result = %s' & result)
     if 'add' in result:
+        print('add')
         add = result.get('add')
         print(add)
         result['add'] = None
@@ -562,6 +563,7 @@ def process_message(message):
                 requests.request('post', '%s%s' % (URL, m['method']), data=m)
             result = add[-1]
     else:
+        print('no add')
         print('no add in %s' % result)
 
     return result
