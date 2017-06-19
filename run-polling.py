@@ -52,7 +52,15 @@ try:
                             if message and 'message' in message:
                                 if not first_run:
                                     response = process_message(message['message'])
-                                    r = requests.request('post', '%s%s' % (URL, response['method']), data=response)
+                                    if response.get('add') is None:
+                                        requests.request('post', '%s%s' % (URL, response['method']), data=response)
+                                    else:
+                                        add = response.get('add')
+                                        response['add'] = None
+                                        requests.request('post', '%s%s' % (URL, response['method']), data=response)
+
+                                        for add_msg in add:
+                                            requests.request('post', '%s%s' % (URL, response['method']), data=add_msg)
 
                             if message and 'callback_query' in message:
                                 message['callback_query']['message']['text'] = message['callback_query']['data']

@@ -6,6 +6,7 @@ import logging
 import random
 import config
 from os import path
+import requests
 
 log = logging.getLogger('app')
 
@@ -14,6 +15,8 @@ tz_offset = 3 * 60 * 60 - int(app.config.get('BOT_TZ_OFFSET'))
 
 BEER_MUG = b'\xF0\x9F\x8D\xBA'.decode('utf-8')
 CLINKING_BEER_MUGS = b'\xF0\x9F\x8D\xBB'.decode('utf-8')
+
+URL = 'https://api.telegram.org/bot%s/' % app.config.get('BOT_TOKEN')
 
 
 def dt(u): return datetime.datetime.fromtimestamp(u)
@@ -200,6 +203,15 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
             ret = process_reply(
                 {'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
             log.info(ret)
+
+            forecast = openweathermap.get_forecast()
+            if forecast:
+                s = ''
+                for f in forecast:
+                    s += '%s — <b>%s°C</b> %s %s\n' % f
+                ret['add'] = [process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': s})]
+                print(s)
+
             return ret
 
         return render_template('weather.html', temp=t, base_url=base_url, ico=ico, main=main,
@@ -536,6 +548,17 @@ def process_message(message):
         result = beer_f(chat_id, message['from'])
     else:
         result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
+
+    if 'add' in result:
+        add = result.get('add')
+        result['add'] = None
+        requests.request('post', '%s%s' % (URL, result['method']), data=result)
+        if len(add) == 1:
+            result = add[0]
+        else:
+            for m in add[:-1]:
+                requests.request('post', '%s%s' % (URL, m['method']), data=m)
+            result = add[-1]
 
     return result
 
