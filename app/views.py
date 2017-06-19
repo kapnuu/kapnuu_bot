@@ -537,6 +537,16 @@ def process_message(message):
     if command in commands:
         result = commands[command](chat_id, message['from'], args, command)
         if result:
+            if 'add' in result:
+                add = result.get('add')
+                result['add'] = None
+                requests.request('post', '%s%s' % (URL, result['method']), data=result)
+                if len(add) == 1:
+                    result = add[0]
+                else:
+                    for m in add[:-1]:
+                        requests.request('post', '%s%s' % (URL, m['method']), data=m)
+                    result = add[-1]
             return result
 
     text = message['text'].lower()
@@ -548,23 +558,6 @@ def process_message(message):
         result = beer_f(chat_id, message['from'])
     else:
         result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
-
-    print('result = %s' % result)
-    if 'add' in result:
-        print('add')
-        add = result.get('add')
-        print('add = %s' % add)
-        result['add'] = None
-        requests.request('post', '%s%s' % (URL, result['method']), data=result)
-        if len(add) == 1:
-            result = add[0]
-        else:
-            for m in add[:-1]:
-                requests.request('post', '%s%s' % (URL, m['method']), data=m)
-            result = add[-1]
-    else:
-        print('no add')
-        print('no add in %s' % result)
 
     return result
 
