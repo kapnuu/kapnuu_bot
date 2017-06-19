@@ -549,6 +549,7 @@ def process_message(message):
     else:
         result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
 
+    print(result)
     if 'add' in result:
         add = result.get('add')
         print(add)
