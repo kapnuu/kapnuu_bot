@@ -553,7 +553,7 @@ def process_message(message):
     if 'add' in result:
         print('add')
         add = result.get('add')
-        print(add)
+        print('add = %s' % add)
         result['add'] = None
         requests.request('post', '%s%s' % (URL, result['method']), data=result)
         if len(add) == 1:
