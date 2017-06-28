@@ -123,11 +123,18 @@ def get_forecast():
     now = datetime.datetime.now()
     today = datetime.datetime(now.year, now.month, now.day)
 
-    morning = (today + datetime.timedelta(hours=9), 'Morning')
-    day = (today + datetime.timedelta(hours=15), 'Day')
-    evening = (today + datetime.timedelta(hours=21), 'Evening')
-    night = (today + datetime.timedelta(hours=27), 'Night')
-    tomorrow = (today + datetime.timedelta(hours=39), 'Tomorrow')
+    morning = (today + datetime.timedelta(hours=6), 'Morning')
+    day = (today + datetime.timedelta(hours=12), 'Day')
+    evening = (today + datetime.timedelta(hours=18), 'Evening')
+    night = (today + datetime.timedelta(hours=24), 'Night')
+    tomorrow = (today + datetime.timedelta(hours=36), 'Tomorrow')
+
+    print('now: %s local' % now)
+    print('today: %s local' % today)
+    print('morning: %s %s utc' % morning)
+    print('day: %s %s utc' % day)
+    print('night: %s %s utc' % night)
+    print('tomorrow: %s %s utc' % tomorrow)
 
     if now.hour < 4:
         next1 = [morning, day, evening]
@@ -138,10 +145,15 @@ def get_forecast():
     elif now.hour < 22:
         next1 = [night, morning, tomorrow]
     else:
-        tomorrow_morning = (today + datetime.timedelta(hours=33), 'Morning')
+        tomorrow_morning = (today + datetime.timedelta(hours=30), 'Morning')
         tomorrow = (tomorrow[0], 'Day')
-        tomorrow_evening = (today + datetime.timedelta(hours=45), 'Evening')
+        tomorrow_evening = (today + datetime.timedelta(hours=42), 'Evening')
         next1 = [tomorrow_morning, tomorrow, tomorrow_evening]
+
+        print('tomorrow_morning: %s %s' % tomorrow_morning)
+        print('tomorrow_evening: %s %s' % tomorrow_evening)
+
+    print(next1)
 
     ret = []
 
@@ -149,7 +161,7 @@ def get_forecast():
     if response.status_code == 200:
         forecast = json.loads(response.text)
         for n in next1:
-            timestamp = calendar.timegm(n[0].utctimetuple()) - 3 * 60 * 60
+            timestamp = calendar.timegm(n[0].utctimetuple())
             item = next((x for x in forecast['list'] if x['dt'] == timestamp), None)
             if item:
                 icon = get_icon(item['weather'][0]['id'])
