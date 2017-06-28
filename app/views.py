@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription
+from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -202,7 +202,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
 %s''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
             ret = process_reply(
                 {'chat_id': chat_id, 'parse_mode': 'html', 'text': res, 'disable_web_page_preview': False})
-            log.info(ret)
+            log.info('%s' % ret)
 
             forecast = openweathermap.get_forecast()
             if forecast:
@@ -449,8 +449,17 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
 
 
 def huify_text_f(chat_id, text, who=None):
-    resp = huificator.huify(transcription.transcribe(text))
-    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
+    text = transcription.transcribe(text)
+    text = wordify.wordify(text, randomize=False)
+    # resp = text
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': text})
+
+
+def huify_text_private_f(chat_id, text, who=None):
+    text = transcription.transcribe(text)
+    text = wordify.wordify(text, randomize=True)
+    # resp = text
+    return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': text})
 
 
 def mynameis_f(chat_id, who, name, cmd):
@@ -557,7 +566,13 @@ def process_message(message):
     elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
         result = beer_f(chat_id, message['from'])
     else:
-        result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
+        t_id = message['from'].get('id')
+
+        user = models.BotUser.query.filter_by(telegram_id=t_id).first()
+        if user and user.huify:
+            result = huify_text_private_f(chat_id, message['text'], message['from'])
+        else:
+            result = process_reply({'chat_id': chat_id, 'text': 'You said: %s. WTF?' % message['text']})
 
     return result
 
