@@ -152,7 +152,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
         ico = 'weather/ico/%s.png' % weather['weather'][0]['icon']
 
         t = weather['main']['temp']
-        t = '%s%s°C' % ('-' if t < 0 else '', t)
+        t = '%.0f°C' % t  # '%s%s°C' % ('-' if t < 0 else '', t)
 
         city = weather['name']
         main = weather['weather'][0]['main']
