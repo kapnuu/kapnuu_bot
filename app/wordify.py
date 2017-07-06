@@ -35,6 +35,8 @@ def _processword(word, uppers, randomize):
 
 
 def wordify(text, randomize=False):
+    if randomize:
+        randomize = len(text) > 70
     res = ''
     word = ''
     uppers = []
