@@ -143,7 +143,7 @@ def get_forecast():
         next1 = [day, evening, tomorrow]
     elif local_hour < 16:
         next1 = [evening, night, tomorrow]
-    elif local_hour <= 22:
+    elif local_hour < 22:
         tomorrow_morning = (today + datetime.timedelta(hours=30), 'Morning')
         next1 = [night, tomorrow_morning, tomorrow]
     else:
