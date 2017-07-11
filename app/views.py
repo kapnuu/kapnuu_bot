@@ -152,7 +152,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
         ico = 'weather/ico/%s.png' % weather['weather'][0]['icon']
 
         t = weather['main']['temp']
-        t = '%s%s°C' % ('-' if t < 0 else '', t)
+        t = '%.0f°C' % t  # '%s%s°C' % ('-' if t < 0 else '', t)
 
         city = weather['name']
         main = weather['weather'][0]['main']
@@ -223,7 +223,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
 
 currencies = [
     ('rur', b'\xf0\x9f\x87\xb7\xf0\x9f\x87\xba', b'\xe2\x82\xbd'),
-    ('usd', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xb8', b'\x00\x24'),
+    ('usd', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xb8', b'\x24'),
     ('eur', b'\xf0\x9f\x87\xaa\xf0\x9f\x87\xba', b'\xe2\x82\xac'),
     ('inr', b'\xf0\x9f\x87\xae\xf0\x9f\x87\xb3', b'\xe2\x82\xb9'),
     ('chf', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xad', b'\xe2\x82\xa3'),
