@@ -1,4 +1,4 @@
-from app import models, db
+from app import models, db, moonphase
 import config
 import requests
 import json
@@ -120,7 +120,7 @@ def get_icon(code):
 
 
 def get_forecast():
-    now = datetime.datetime.now()
+    now = datetime.datetime.utcnow()
     today = datetime.datetime(now.year, now.month, now.day)
 
     morning = (today + datetime.timedelta(hours=6), 'Morning')
@@ -129,21 +129,23 @@ def get_forecast():
     night = (today + datetime.timedelta(hours=24), 'Night')
     tomorrow = (today + datetime.timedelta(hours=36), 'Tomorrow')
 
-    print('now: %s local' % now)
-    print('today: %s local' % today)
+    print('now: %s utc' % now)
+    print('today: %s utc' % today)
     print('morning: %s %s utc' % morning)
     print('day: %s %s utc' % day)
     print('night: %s %s utc' % night)
     print('tomorrow: %s %s utc' % tomorrow)
 
-    if now.hour < 4:
+    local_hour = now.hour + 3
+    if local_hour < 4:
         next1 = [morning, day, evening]
-    elif now.hour < 10:
+    elif local_hour < 10:
         next1 = [day, evening, tomorrow]
-    elif now.hour < 16:
+    elif local_hour < 16:
         next1 = [evening, night, tomorrow]
-    elif now.hour < 22:
-        next1 = [night, morning, tomorrow]
+    elif local_hour <= 22:
+        tomorrow_morning = (today + datetime.timedelta(hours=30), 'Morning')
+        next1 = [night, tomorrow_morning, tomorrow]
     else:
         tomorrow_morning = (today + datetime.timedelta(hours=30), 'Morning')
         tomorrow = (tomorrow[0], 'Day')
@@ -164,6 +166,10 @@ def get_forecast():
             timestamp = calendar.timegm(n[0].utctimetuple())
             item = next((x for x in forecast['list'] if x['dt'] == timestamp), None)
             if item:
-                icon = get_icon(item['weather'][0]['id'])
+                code = item['weather'][0]['id']
+                if n[1] == 'Night' and code == 800:
+                    icon = moonphase.moonphase(datetime.datetime.now())[0]
+                else:
+                    icon = get_icon(code)
                 ret.append((n[1], int(item['main']['temp'] + 0.5), icon, item['weather'][0]['main']))
     return ret
