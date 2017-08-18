@@ -66,6 +66,8 @@ def process_request():
             elif 'callback_query' in data:
                 message = data['callback_query']['message']
                 message['text'] = data['callback_query']['data']
+            elif 'sticker' in data:
+                message['text'] = data['sticker']['emoji']
 
             if message:
                 return app.response_class(
