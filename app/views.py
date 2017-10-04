@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify
+from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -446,7 +446,11 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
     if who.get('first_name'):
         greet = who.get('first_name')
 
-    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
+    holiday = wiki_calendar.get_drink_occasion()
+    if holiday:
+        resp = '%s, %s\n%s' % (greet, CLINKING_BEER_MUGS, holiday.to_str())
+    else:
+        resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
@@ -526,6 +530,7 @@ commands = {
     '/huify': huify_unhuify_f,
     '/unhuify': huify_unhuify_f,
     '/mynameis': mynameis_f,
+    '/drink': beer_f,
 }
 
 
