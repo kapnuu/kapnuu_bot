@@ -566,7 +566,12 @@ def process_message(message):
             return result
 
     text = message['text'].lower()
-    if text == 'замучить котов' \
+    if text == 'cancel':
+        keyboard = {
+            'remove_keyboard': True,
+        }
+        result = process_reply({'chat_id': chat_id, 'text': 'As you want', 'reply_markup': json.dumps(keyboard)})
+    elif text == 'замучить котов' \
             or text == 'мучить котов' \
             or text == 'torture cats':
         result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
