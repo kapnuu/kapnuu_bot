@@ -21,6 +21,7 @@ log = logging.getLogger('app')
 signal.signal(signal.SIGTERM, signal_term_handler)
 
 try:
+    #print('😞'.encode('utf-8'))
     log.info('Bot token is %s' % app.config.get('BOT_TOKEN'))
 
     set_hook = requests.get(URL + 'setWebhook?url=')
@@ -42,6 +43,7 @@ try:
             if not json['ok'] or not json['result']:
                 tmo *= 1.5
             else:
+                #log.info('%s' % json)
                 updates = json['result']
                 for message in updates:
                     if 'update_id' in message:
