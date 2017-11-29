@@ -1,4 +1,4 @@
-from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar
+﻿from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar, yandexgeo
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -15,6 +15,13 @@ tz_offset = 3 * 60 * 60 - int(app.config.get('BOT_TZ_OFFSET'))
 
 BEER_MUG = b'\xF0\x9F\x8D\xBA'.decode('utf-8')
 CLINKING_BEER_MUGS = b'\xF0\x9F\x8D\xBB'.decode('utf-8')
+
+nevelny = {}
+BLET = ['CAADAgADowAD12sEFoKFW18ZTHA7Ag',
+        'CAADAgADLwAD12sEFj-pk35Cn903Ag',
+        'CAADAgADLgADa-HIEz-pZ80pPFhKAg',
+        'CAADAgADiAAD12sEFnq1CqqkApnIAg']
+
 
 URL = 'https://api.telegram.org/bot%s/' % app.config.get('BOT_TOKEN')
 
@@ -54,8 +61,9 @@ def process_reply(resp):
 @app.route('/%s/hook' % config.Config.REQUEST_TOKEN, methods=['GET', 'POST'])
 def process_request():
     try:
-        data = request.json  # json.loads(request.data)
-        log.info(data)
+        data = request.json
+        #log.info(request.data)
+        print('%s' % json.dumps(data))
         #  log.info(request.headers)
         if data:
             message = None
@@ -70,6 +78,7 @@ def process_request():
             if message:
                 if 'sticker' in message:
                     message['text'] = message['sticker']['emoji']
+                    #print('%s' % json.dumps(data))
                 return app.response_class(
                     response=json.dumps(process_message(message)),
                     status=200,
@@ -455,6 +464,14 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
 
 
 def huify_text_f(chat_id, text, who=None):
+    if text.lower() == 'нэвэльный':
+        who_id = who.get('id')
+        if who_id not in nevelny:
+            nevelny[who_id] = -1
+        nevelny[who_id] = (nevelny[who_id] + 1) % len(BLET)
+        
+        return process_reply({'chat_id': chat_id, 'method': 'sendSticker', 'sticker': BLET[nevelny[who_id]]})
+
     text = transcription.transcribe(text)
     text = wordify.wordify(text, randomize=False)
     # resp = text
@@ -496,6 +513,46 @@ def mynameis_f(chat_id, who, name, cmd):
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
+def whereami_f(chat_id, who=None, args=None, cmd=None):
+    keyboard = {
+        'keyboard': [
+            [{'text': 'Share location', 'request_location': True},
+             {'text': 'Forget location'},
+             {'text': 'Cancel'}]
+        ],
+        'resize_keyboard': True,
+        'one_time_keyboard': True,
+    }
+
+    ret = process_reply({'chat_id': chat_id,
+                         'text': 'Please select your location ' + b'\xf0\x9f\x8c\x90'.decode() +
+                                 '\nOr not ' + b'\xf0\x9f\x91\x80'.decode(),
+                         'reply_markup': json.dumps(keyboard)})
+    # log.info(ret)
+    return ret
+
+
+def drink_f(chat_id, who=None, args=None, cmd=None):
+    return process_reply({'chat_id': chat_id, 'method': 'sendSticker', 'sticker': 'CAADAgADiQAD12sEFvQF6xz18ISZAg'})
+
+
+def do_find_location(chat_id, lat, long):
+    print('lat=%f long=%f' % (lat, long))
+    locs = yandexgeo.find_locations(lat, long, 5)
+    if locs:
+        keyboard = {'inline_keyboard': [
+            [{'text': x,
+              'callback_data': '/location ' + json.dumps({'name': x, 'lat': lat, 'long': long})}] for x in locs],
+        }
+        #  + json.dumps({'name': x, 'lat': lat, 'long': long})
+        print(keyboard)
+
+        return process_reply({'chat_id': chat_id, 'text': 'I found some places near you:',
+                              'reply_markup': json.dumps(keyboard)})
+    else:
+        return process_reply({'chat_id': chat_id, 'text': 'Can\'t find you ' + b'\xf0\x9f\x98\x9e'.decode()})
+
+
 def test_img_f(chat_id, who=None, args=None, cmd=None):
     # keyboard = {'inline_keyboard': [
     #    [{'text': '1', 'callback_data': '/weather'},
@@ -520,6 +577,7 @@ commands = {
     '/help': start_f,
     '/start': start_f,
     '/whoami': whoami_f,
+    '/whereami': whereami_f,
     '/weather': weather_f,
     '/traffic': nn_traffic_f,
     '/now': now_f,
@@ -530,12 +588,15 @@ commands = {
     '/huify': huify_unhuify_f,
     '/unhuify': huify_unhuify_f,
     '/mynameis': mynameis_f,
-    '/drink': beer_f,
+    '/drink': drink_f,#beer_f,
 }
 
 
 def process_message(message):
     chat_id = message['chat']['id']
+
+    if 'location' in message:
+        return do_find_location(chat_id, message['location']['latitude'], message['location']['longitude'])
 
     req = message['text'].split(maxsplit=1)
     if len(req) > 1:
@@ -567,6 +628,12 @@ def process_message(message):
 
     text = message['text'].lower()
     if text == 'cancel':
+        keyboard = {
+            'remove_keyboard': True,
+        }
+        result = process_reply({'chat_id': chat_id, 'text': 'As you want', 'reply_markup': json.dumps(keyboard)})
+    elif text == 'forget location':
+        # TODO forget user location
         keyboard = {
             'remove_keyboard': True,
         }
