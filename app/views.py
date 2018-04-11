@@ -624,6 +624,7 @@ def process_message(message):
     if command in commands:
         result = commands[command](chat_id, message['from'], args, command)
         if result:
+            print('result: %s' % result)
             if 'add' in result:
                 add = result.get('add')
                 result.pop('add')
