@@ -553,10 +553,11 @@ def do_find_location(chat_id, lat, long):
         }
         #print(keyboard)
 
-        process_reply({'chat_id': chat_id, 'text': 'I found some places near you:',
+        ret = process_reply({'chat_id': chat_id, 'text': 'I found some places near you:',
                               'reply_markup': json.dumps(keyboard)})
-        return process_reply({'chat_id': chat_id, 'text': 'Please select one.',
+        ret['add'] = process_reply({'chat_id': chat_id, 'text': 'Please select one.',
                               'reply_markup': json.dumps(keyboard2)})
+        return ret
     else:
         return process_reply({'chat_id': chat_id, 'text': 'Can\'t find you ' + b'\xf0\x9f\x98\x9e'.decode(),
                               'reply_markup': json.dumps(keyboard2)})
