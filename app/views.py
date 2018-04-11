@@ -543,8 +543,12 @@ def do_find_location(chat_id, lat, long):
     if locs:
         keyboard = {'inline_keyboard': [
             [{'text': x,
-              'callback_data': '/location ' + json.dumps({'name': x, 'lat': lat, 'long': long})}] for x in locs],
+              'callback_data': '/location %s,%f,%f' % (x, lat, long)}] for x in locs],
         }
+        #keyboard = {'inline_keyboard': [
+        #    [{'text': x,
+        #      'callback_data': '/location ' + json.dumps({'name': x, 'lat': lat, 'long': long})}] for x in locs],
+        #}
         #  + json.dumps({'name': x, 'lat': lat, 'long': long})
         print(keyboard)
 
