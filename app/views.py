@@ -543,22 +543,23 @@ def drink_f(chat_id, who=None, args=None, cmd=None):
 def do_find_location(chat_id, lat, long):
     print('lat=%f long=%f' % (lat, long))
     locs = yandexgeo.find_locations(lat, long, 5)
+
+    keyboard2 = { 'remove_keyboard': True, }
+
     if locs:
         keyboard = {'inline_keyboard': [
             [{'text': x,
-              'callback_data': '/location %s,%f,%f' % (x, lat, long)}] for x in locs],
+              'callback_data': '/location %f,%f,%s' % (lat, long, x)}] for x in locs],
         }
-        #keyboard = {'inline_keyboard': [
-        #    [{'text': x,
-        #      'callback_data': '/location ' + json.dumps({'name': x, 'lat': lat, 'long': long})}] for x in locs],
-        #}
-        #  + json.dumps({'name': x, 'lat': lat, 'long': long})
-        print(keyboard)
+        #print(keyboard)
 
-        return process_reply({'chat_id': chat_id, 'text': 'I found some places near you:',
+        process_reply({'chat_id': chat_id, 'text': 'I found some places near you:',
                               'reply_markup': json.dumps(keyboard)})
+        return process_reply({'chat_id': chat_id, 'text': 'Please select one.',
+                              'reply_markup': json.dumps(keyboard2)})
     else:
-        return process_reply({'chat_id': chat_id, 'text': 'Can\'t find you ' + b'\xf0\x9f\x98\x9e'.decode()})
+        return process_reply({'chat_id': chat_id, 'text': 'Can\'t find you ' + b'\xf0\x9f\x98\x9e'.decode(),
+                              'reply_markup': json.dumps(keyboard2)})
 
 
 def test_img_f(chat_id, who=None, args=None, cmd=None):
