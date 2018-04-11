@@ -74,6 +74,7 @@ def process_request():
             elif 'callback_query' in data:
                 message = data['callback_query']['message']
                 message['text'] = data['callback_query']['data']
+                message['from'] = data['callback_query']['from']
 
             if message:
                 if 'sticker' in message:
