@@ -455,11 +455,12 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
     if who.get('first_name'):
         greet = who.get('first_name')
 
-    holiday = wiki_calendar.get_drink_occasion()
-    if holiday:
-        resp = '%s, %s\n%s' % (greet, CLINKING_BEER_MUGS, holiday.to_str())
-    else:
-        resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
+    # holiday = wiki_calendar.get_drink_occasion()
+    #if holiday:
+    #    resp = '%s, %s\n%s' % (greet, CLINKING_BEER_MUGS, holiday.to_str())
+    #else:
+    #    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
+    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
