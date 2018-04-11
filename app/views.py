@@ -79,6 +79,8 @@ def process_request():
                 if 'sticker' in message:
                     message['text'] = message['sticker']['emoji']
                     #print('%s' % json.dumps(data))
+                elif 'document' in message:
+                    message['text'] = 'TODO: send WTF response'
                 return app.response_class(
                     response=json.dumps(process_message(message)),
                     status=200,
