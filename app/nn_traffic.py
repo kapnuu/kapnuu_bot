@@ -28,7 +28,7 @@ def get_traffic():
     r = requests.get('http://www.nn.ru')
     if r.status_code == 200:
         text = r.text
-        g = re.search(r'([0-9]+)&nbsp;балл', text).groups()
+        g = re.search(r'([0-9]+)\sбалл', text).groups()
         if len(g) > 0:
             idx = int(g[0])
     return idx
