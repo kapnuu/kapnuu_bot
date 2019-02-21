@@ -25,7 +25,7 @@ actuality = 30  # minutes
 
 def get_traffic():
     idx = None
-    r = requests.get('http://m.nn.ru')
+    r = requests.get('http://www.nn.ru')
     if r.status_code == 200:
         text = r.text
         g = re.search(r'([0-9]+)&nbsp;балл', text).groups()
