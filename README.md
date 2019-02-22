@@ -6,10 +6,10 @@
 
 [Telegram bot](https://t.me/kapnuu_bot)
 
-/help - help message
-/weather - get current weather in Nizhniy Novgorod (other cities TBD)
-/currency - get currency(use /currency/_&lt;ISO&gt;_) to RUB rate
-/now - get current date and time in UTC
-/whoami - get your personal settings
-/traffic - get traffic jams level in Nizhniy Novgorod
-/huify - huify message (with args: /huify _&lt;some text&gt;_) or start huifying all your messages
+**/help** — help message  
+**/weather** — get current weather in Nizhniy Novgorod (other cities TBD)  
+**/currency** — get currency (use /currency/_&lt;ISO&gt;_) to RUB rate  
+**/now** — get current date and time in UTC  
+**/whoami** — get your personal settings  
+**/traffic** — get traffic jams level in Nizhniy Novgorod  
+**/huify** — huify message (with args: /huify _&lt;some text&gt;_) or start huifying all your messages  
