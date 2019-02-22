@@ -23,7 +23,7 @@ log = logging.getLogger('app')
 actuality = 30  # minutes
 
 
-def get_traffic():
+def get_traffic_old():
     idx = None
     r = requests.get('http://www.nn.ru')
     if r.status_code == 200:
@@ -32,6 +32,17 @@ def get_traffic():
         if len(g) > 0:
             idx = int(g[0])
     return idx
+
+
+def get_traffic():
+    data = {
+        'lang': 'ru_RU',
+        'ids': [47, 11079]
+    }
+    r = requests.get('https://core-jams-rdr.maps.yandex.net/description/traffic-light', params=data)
+    if r.status_code == 200:
+        response = r.json()
+        return response['data']['features'][0]['properties']['JamsMetaData']['level']
 
 
 def get_actual_value():
