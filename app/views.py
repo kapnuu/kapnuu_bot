@@ -308,7 +308,7 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
 @app.route('/now')
 def now_f(chat_id=None, who=None, args=None, cmd=None):
     now = datetime.datetime.now()
-    resp = '%s UTC' % now.strftime('%a %b %d %T.%f %Y')
+    resp = '%s UTC\n%i' % (now.strftime('%a %b %d %T.%f %Y'), now.timestamp())
 
     if chat_id:
         return process_reply({'chat_id': chat_id, 'text': resp})
