@@ -16,8 +16,8 @@ def get_exchange_rate(api_key, from_currencies, to_currency):
         }
         r = requests.get(_URL, params=params)
         if r.status_code == 200:
-            log.info('get_exchange_rate: %s', r.text)
-            print('%s' % r.text)
+            log.debug('get_exchange_rate: %s', r.text)
+            #print('%s' % r.text)
             jrate = r.json()
             if jrate['success']:
                 jquotes = jrate['quotes']
