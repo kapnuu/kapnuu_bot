@@ -16,6 +16,7 @@ def signal_term_handler(signum, frame):
     print('SIGTERM received')
     sys.exit(1)
 
+
 log = logging.getLogger('app')
 
 signal.signal(signal.SIGTERM, signal_term_handler)

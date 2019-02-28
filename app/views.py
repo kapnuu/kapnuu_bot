@@ -1,4 +1,4 @@
-﻿from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar, yandexgeo, emoji
+﻿from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar, yandexgeo, emoji, currencylayer
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -23,10 +23,12 @@ BLET = ['CAADAgADowAD12sEFoKFW18ZTHA7Ag',
 URL = 'https://api.telegram.org/bot%s/' % app.config.get('BOT_TOKEN')
 
 
-def dt(u): return datetime.datetime.fromtimestamp(u)
+def dt(u):
+    return datetime.datetime.fromtimestamp(u)
 
 
-def ut(d): return calendar.timegm(d.timetuple())
+def ut(d):
+    return calendar.timegm(d.timetuple())
 
 
 @app.route('/')
@@ -136,7 +138,7 @@ You can get info by sending these commands:
 /help — this message
 /weather — get current weather in Nizhniy Novgorod (other cities TBD)
 /currency — get currency (use /currency <i>ISO</i>) to RUR rate
-/now — get current date and time in UTC
+/now — get current date and time in UTC/Unix timestamp
 /whoami — get your personal settings
 /traffic — traffic jams in Nizhniy Novgorod
 
@@ -205,10 +207,6 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
                    dt(sunrise).strftime('%H:%M'), dt(sunset).strftime('%H:%M'))
 
         if chat_id:
-            # return send_reply({'method': 'sendPhoto',
-            #            'chat_id': chat_id,
-            #            'caption': resp,
-            #            'photo': ico})
             res = '''<b>%s</b>: <a href="%sweather?%s">%s, %s</a>
 %s''' % (city, base_url, random.uniform(0.0, 1.0), t, main, timestamp)
             ret = process_reply(
@@ -233,7 +231,7 @@ def weather_f(chat_id=None, who=None, args=None, cmd=None):
 
 
 currencies = [
-    ('rur', b'\xf0\x9f\x87\xb7\xf0\x9f\x87\xba', b'\xe2\x82\xbd'),
+    ('rub', b'\xf0\x9f\x87\xb7\xf0\x9f\x87\xba', b'\xe2\x82\xbd'),
     ('usd', b'\xf0\x9f\x87\xba\xf0\x9f\x87\xb8', b'\x24'),
     ('eur', b'\xf0\x9f\x87\xaa\xf0\x9f\x87\xba', b'\xe2\x82\xac'),
     ('inr', b'\xf0\x9f\x87\xae\xf0\x9f\x87\xb3', b'\xe2\x82\xb9'),
@@ -251,6 +249,8 @@ currencies = [
     ('czk', b'\xf0\x9f\x87\xa8\xf0\x9f\x87\xbf', b'K\xc4\x8d'),
 ]
 
+_ISOs = ['USD', 'EUR', 'INR', 'CHF', 'GBP', 'JPY', 'UAH', 'KZT', 'BYN', 'TRY', 'CNY', 'AUD', 'CAD', 'PLN', 'CZK', 'RUB']
+
 
 @app.route('/currency/<args>', methods=['GET'])
 def currency_f(chat_id=None, who=None, args=None, cmd=None):
@@ -258,11 +258,9 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
     iso = args
     if not iso:
         buttons = []
-        for cur in currencies:
-            if cur[0] != 'rur':
-                buttons.append(
-                    {'text': '%s %s' % (cur[1].decode('utf-8'), cur[0].upper()),
-                     'callback_data': '/currency %s' % cur[0]})
+        for cur in currencies[1:]:
+            buttons.append({'text': '%s %s' % (cur[1].decode('utf-8'), cur[0].upper()),
+                           'callback_data': '/currency %s' % cur[0]})
 
         blen3 = len(buttons) / 4
         keyboard = {'inline_keyboard': [
@@ -276,25 +274,30 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
     else:
         resp = fmt = flag = sym = rate = None
 
-        rur = currencies[0]
-        rur_sym = rur[2].decode('utf-8')
+        rub = currencies[0]
+        rub_sym = rub[2].decode('utf-8')
 
         iso = iso.lower()
+        if iso == 'rub':
+            flag = rub[1].decode('utf-8')
+            resp = '%s 1 %s is 1 %s %s, dude!' % (flag, rub_sym, rub_sym, flag)
         if iso == 'rur':
-            flag = rur[1].decode('utf-8')
-            resp = '%s 1 %s is 1 %s %s, dude!' % (flag, rur_sym, rur_sym, flag)
+            flag = rub[1].decode('utf-8')
+            resp = '%s 1 RUR is 1000 %s %s, dude!' % (flag, rub_sym, flag)
         else:
-            rate = cbr.currency_rate(iso)
+            # rate = cbr.currency_rate(iso)
+            rates = currencylayer.get_exchange_rate(config.Config.CURRENCYLAYER_KEY, _ISOs, 'RUB')
+            rate = rates.get(iso)
             if rate:
                 cur = next((x for x in currencies if x[0] == iso), None)
                 flag = '%s ' % cur[1].decode('utf-8') if cur else ''
                 sym = cur[2].decode('utf-8') if cur else iso.upper()
-                fmt = '%s %s %s = %.2f %s ' + rur[1].decode('utf-8')
+                fmt = '%s %s %s = %.2f %s ' + rub[1].decode('utf-8')
             else:
                 resp = 'I don\'t know <i>%s</i>' % iso.upper()
 
         if not resp:
-            resp = fmt % (flag, rate[0], sym, rate[1], rur_sym)
+            resp = fmt % (flag, rate[0], sym, rate[1], rub_sym)
 
     if chat_id:
         response = {'chat_id': chat_id, 'parse_mode': 'html', 'text': resp}
@@ -333,6 +336,8 @@ def nn_traffic_f(chat_id=None, who=None, args=None, cmd=None):
                              'chat_id': chat_id,
                              'caption': 'Nizhniy Novgorod: %s' % res[1],
                              'photo': photo})
+        map_photo = 'https://static-maps.yandex.ru/1.x/?lang=en_US&ll=%f,%f&size=360,360&z=12&l=map,trf' % (43.996013, 56.281357)
+        ret['add'] = [process_reply({'method': 'sendPhoto', 'chat_id': chat_id, 'photo': map_photo})]
         return ret
 
     return send_from_directory('static/traffic-ico', 'traffic%s.png' % res[0])  # '<pre>%s</pre>' % resp

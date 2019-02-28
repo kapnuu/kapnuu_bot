@@ -27,6 +27,8 @@ class Config:
 
     BOT_TZ_OFFSET = os.environ.get('BOT_TZ_OFFSET')
 
+    CURRENCYLAYER_KEY = os.environ.get('CURRENCYLAYER_KEY')
+
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -44,5 +46,7 @@ class DevelopConfig(Config):
             HEROKU_APP_NAME = f.readline().strip()
             OWM_APIKEY = f.readline().strip()
             OWM_CITYID = f.readline().strip()
+            xz = f.readline().strip()
+            CURRENCYLAYER_KEY = f.readline().strip()
     except:
         pass
