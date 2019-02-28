@@ -1,4 +1,4 @@
-﻿from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar, yandexgeo
+﻿from app import app, openweathermap, cbr, models, db, nn_traffic, huificator, transcription, wordify, wiki_calendar, yandexgeo, emoji
 import calendar
 import datetime
 from flask import json, request, abort, send_from_directory, render_template
@@ -12,9 +12,6 @@ log = logging.getLogger('app')
 
 # TODO use user timezone
 tz_offset = 3 * 60 * 60 - int(app.config.get('BOT_TZ_OFFSET'))
-
-BEER_MUG = b'\xF0\x9F\x8D\xBA'.decode('utf-8')
-CLINKING_BEER_MUGS = b'\xF0\x9F\x8D\xBB'.decode('utf-8')
 
 nevelny = {}
 BLET = ['CAADAgADowAD12sEFoKFW18ZTHA7Ag',
@@ -127,8 +124,8 @@ def start_f(chat_id=None, who=None, args=None, cmd=None):
 
     responses = ['Hello, %s!',
                  'Hi there, %s.',
-                 'Дратути, %s!',
-                 'Привет, %s!',
+                 # 'Дратути, %s!',
+                 # 'Привет, %s!',
                  'Hi, %s!']  # , 'Ксюшенька-пампушенька, любищь тебя, дурочку']
 
     hi = random.choice(responses) % (greet if greet else 'Human')
@@ -310,7 +307,8 @@ def currency_f(chat_id=None, who=None, args=None, cmd=None):
 
 @app.route('/now')
 def now_f(chat_id=None, who=None, args=None, cmd=None):
-    resp = '%s UTC' % datetime.datetime.now().strftime('%a %b %d %T.%f %Y')
+    now = datetime.datetime.now()
+    resp = '%s UTC' % now.strftime('%a %b %d %T.%f %Y')
 
     if chat_id:
         return process_reply({'chat_id': chat_id, 'text': resp})
@@ -460,10 +458,10 @@ def beer_f(chat_id, who=None, args=None, cmd=None):
 
     # holiday = wiki_calendar.get_drink_occasion()
     #if holiday:
-    #    resp = '%s, %s\n%s' % (greet, CLINKING_BEER_MUGS, holiday.to_str())
+    #    resp = '%s, %s\n%s' % (greet, emoji.CLINKING_BEER_MUGS, holiday.to_str())
     #else:
-    #    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
-    resp = '%s, %s' % (greet, CLINKING_BEER_MUGS)
+    #    resp = '%s, %s' % (greet, emoji.CLINKING_BEER_MUGS)
+    resp = '%s, %s' % (greet, emoji.CLINKING_BEER_MUGS)
     return process_reply({'chat_id': chat_id, 'parse_mode': 'html', 'text': resp})
 
 
@@ -654,7 +652,7 @@ def process_message(message):
             or text == 'мучить котов' \
             or text == 'torture cats':
         result = process_reply({'chat_id': chat_id, 'text': 'КОТОВ МУЧИТЬ НЕЛЬЗЯ, СУЧКА!!'})
-    elif text == BEER_MUG or text == CLINKING_BEER_MUGS:
+    elif text == emoji.BEER_MUG or text == emoji.CLINKING_BEER_MUGS:
         result = beer_f(chat_id, message['from'])
     else:
         t_id = message['from'].get('id')
