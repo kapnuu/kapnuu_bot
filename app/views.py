@@ -336,7 +336,7 @@ def nn_traffic_f(chat_id=None, who=None, args=None, cmd=None):
                              'chat_id': chat_id,
                              'caption': 'Nizhniy Novgorod: %s' % res[1],
                              'photo': photo})
-        map_photo = 'https://static-maps.yandex.ru/1.x/?lang=en_US&ll=%f,%f&size=360,360&z=12&l=map,trf' % (43.996013, 56.281357)
+        map_photo = 'https://static-maps.yandex.ru/1.x/?lang=en_US&ll=%f,%f&size=360,360&z=12&l=map,trf&r=%s' % (43.996013, 56.281357, random.uniform(0.0, 1.0))
         ret['add'] = [process_reply({'method': 'sendPhoto', 'chat_id': chat_id, 'photo': map_photo})]
         return ret
 
