@@ -83,12 +83,14 @@ def process_request():
                     message['text'] = 'TODO: send WTF response'
                 elif 'new_chat_member' in message:
                     member = message['new_chat_member']['first_name']
-                    message['text'] = f'Who is {member}'
-                return app.response_class(
-                    response=json.dumps(process_message(message)),
-                    status=200,
-                    mimetype='application/json'
-                )
+                    message['text'] = f'Who is {member}?'
+                response = process_message(message)
+                if response:
+                    return app.response_class(
+                        response=json.dumps(response),
+                        status=200,
+                        mimetype='application/json'
+                    )
             else:
                 log.error('No `message` in request.json: %s' % request.data)
         else:
@@ -626,6 +628,8 @@ def process_message(message):
 
     if command.startswith('/'):
         command = command.lower()
+    elif 'chat' in message and 'type' in message['chat'] and message['chat']['type'] == 'supergroup':
+        return
 
     if command in commands:
         result = commands[command](chat_id, message['from'], args, command)
