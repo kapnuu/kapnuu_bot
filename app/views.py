@@ -84,7 +84,7 @@ def process_request():
                     member = message['new_chat_member']['first_name']
                     message['text'] = f'Who is {member}?'
                 elif 'group_chat_created' in message:
-                    message['text'] = 'hi!'
+                    message['text'] = '!!!!'
                 response = process_message(message)
                 if response:
                     return app.response_class(
@@ -92,6 +92,12 @@ def process_request():
                         status=200,
                         mimetype='application/json'
                     )
+                else:
+                    return app.response_class(
+                        status=200,
+                        mimetype='application/json'
+                    )
+
             else:
                 log.error('No `message` in request.json: %s' % request.data)
         else:
