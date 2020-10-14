@@ -81,6 +81,9 @@ def process_request():
                     #print('%s' % json.dumps(data))
                 elif 'document' in message:
                     message['text'] = 'TODO: send WTF response'
+                elif 'new_chat_member' in message:
+                    member = message['new_chat_member']['first_name']
+                    message['text'] = f'Who is {member}'
                 return app.response_class(
                     response=json.dumps(process_message(message)),
                     status=200,
