@@ -628,8 +628,8 @@ def process_message(message):
 
     if command.startswith('/'):
         command = command.lower()
-    # elif 'chat' in message and 'type' in message['chat'] and message['chat']['type'] == 'supergroup':
-    #    return
+    elif 'chat' in message and 'type' in message['chat'] and message['chat']['type'] == 'supergroup':
+        return {}
 
     if command in commands:
         result = commands[command](chat_id, message['from'], args, command)
