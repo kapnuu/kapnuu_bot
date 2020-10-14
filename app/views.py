@@ -385,7 +385,7 @@ def whoami_f(chat_id=None, who=None, args=None, cmd=None):
         huify = user.huify
 
     resp = '''Hello, %s!
-    
+
 This feature is in development now.''' % who_name
     if huify:
         resp += '''
@@ -628,8 +628,8 @@ def process_message(message):
 
     if command.startswith('/'):
         command = command.lower()
-    elif 'chat' in message and 'type' in message['chat'] and message['chat']['type'] == 'supergroup':
-        return
+    # elif 'chat' in message and 'type' in message['chat'] and message['chat']['type'] == 'supergroup':
+    #    return
 
     if command in commands:
         result = commands[command](chat_id, message['from'], args, command)
