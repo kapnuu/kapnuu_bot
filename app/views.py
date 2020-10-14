@@ -78,12 +78,13 @@ def process_request():
             if message:
                 if 'sticker' in message:
                     message['text'] = message['sticker']['emoji']
-                    #print('%s' % json.dumps(data))
                 elif 'document' in message:
                     message['text'] = 'TODO: send WTF response'
                 elif 'new_chat_member' in message:
                     member = message['new_chat_member']['first_name']
                     message['text'] = f'Who is {member}?'
+                elif 'group_chat_created' in message:
+                    message['text'] = 'hi!'
                 response = process_message(message)
                 if response:
                     return app.response_class(
